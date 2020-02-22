@@ -1,0 +1,25 @@
+{
+  "name": "eToro Delta",
+  "version": "1.0",
+  "description": "Display changes in eToro portfolio page",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.etoro.com/*"
+      ],
+      "js": [
+        "main.js"
+      ]
+    }
+  ],
+  "manifest_version": 2
+}

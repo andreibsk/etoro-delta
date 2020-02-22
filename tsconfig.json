@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "sourceMap": true
+    }
+}
