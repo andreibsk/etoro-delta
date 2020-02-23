@@ -1,8 +1,9 @@
-import { Utils } from "./Utils";
 import { PortfolioListView } from "./PortfolioListView";
 import { SyncEvent } from "ts-events";
+import { findTarget } from "./Utils";
 
 export class UiLayout {
+    public static readonly selector: string = "ui-layout";
     private static observerOptions: MutationObserverInit = { childList: true, subtree: true };
 
     private readonly element: Element;
@@ -26,12 +27,8 @@ export class UiLayout {
             this.observer.observe(this.element, UiLayout.observerOptions)
     }
 
-    public static get selector(): string {
-        return "ui-layout";
-    }
-
     private onMutationObserved(mutations: MutationRecord[], observer: MutationObserver) {
-        const portfolioMutation = Utils.findTarget(mutations, PortfolioListView.selector);
+        const portfolioMutation = findTarget(mutations, PortfolioListView.selector);
         
         if (portfolioMutation?.added == true) {
             console.assert(!this.portfolioListView);

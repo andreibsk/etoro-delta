@@ -1,16 +1,18 @@
-export class PortfolioListView {
-    element: Element;
-    // observer: MutationObserver;
+import { PortfolioListRow } from "./PortfolioListRow";
 
-    public static get selector(): string {
-        return "portfolio-list-view";
-    }
+export class PortfolioListView {
+    public static readonly selector: string = "portfolio-list-view";
+
+    private readonly element: Element;
+    private readonly rows: PortfolioListRow[];
 
     constructor(element: Element) {
         if (!element.matches(PortfolioListView.selector))
             throw new Error("Element doesn't match a PortfolioListView.");
 
         this.element = element;
-        // this.observer = new MutationObserver(this.onMutationObserved);
+        this.rows = PortfolioListRow
+            .parseAll(element.querySelector(PortfolioListRow.tableBodySelector));
     }
+
 }
