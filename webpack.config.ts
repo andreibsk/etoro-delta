@@ -5,9 +5,13 @@ const ExtensionReloader = require('webpack-extension-reloader');
 
 const config: ConfigurationFactory = (_env, argv) => {
     const devMode = argv.mode === 'development';
+    const devtool = devMode ? 'inline-source-map' : false;
+
+    console.log("Development mode:", devMode);
+    console.log("devtool:", devtool);
 
     return {
-        devtool: devMode ? 'inline-source-map' : false,
+        devtool,
         entry:
         {
             main: "./src/main.ts",
@@ -15,6 +19,18 @@ const config: ConfigurationFactory = (_env, argv) => {
         },
         output: {
             path: path.resolve(__dirname, 'dist/')
+        },
+        resolve: {
+            extensions: ['.tsx', '.ts', '.js'],
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    use: 'ts-loader',
+                    include: path.resolve(__dirname, 'src/')
+                },
+            ],
         },
         plugins: [
             new CopyWebpackPlugin([{ from: './src/manifest.json' }]),
