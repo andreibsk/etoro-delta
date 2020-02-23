@@ -1,28 +1,33 @@
+const selectorFor = {
+    cell: (s: string) => `[data-etoro-automation-id='portfolio-overview-table-body-cell-${s}']`,
+    cellContainer: (s: string) => `[data-etoro-automation-id='portfolio-overview-table-cell-container-${s}']`
+};
+
+const selector = {
+    portfolioListRow: ".ui-table-row-container",
+
+    marketNameCell: selectorFor.cell("market-name"),
+    profitCell: selectorFor.cell("profit"),
+    gainCell: selectorFor.cell("gain"),
+};
+
 export class PortfolioListRow {
-    public static readonly selector: string = ".ui-table-row-container";
-    public static readonly tableBodySelector: string = "ui-table-body";
+    public static readonly elementSelector: string = selector.portfolioListRow;
 
     private readonly element: Element;
-    private readonly marketNameElement: Element;
     private readonly profitElement: Element;
     private readonly gainElement: Element;
 
+    public readonly marketName: string;
+
     constructor(element: Element) {
-        if (!element.matches(PortfolioListRow.selector))
+        if (!element.matches(PortfolioListRow.elementSelector))
             throw new Error("Element doesn't match a PortfolioListRow.");
 
         this.element = element;
-
-        const cellSelector = 
-            (name: string) => `[data-etoro-automation-id='portfolio-overview-table-body-cell-${name}']`;
-
-        this.marketNameElement = this.element.querySelector(cellSelector("market-name"));
-        this.profitElement = this.element.querySelector(cellSelector("profit"));
-        this.gainElement = this.element.querySelector(cellSelector("gain"));
-    }
-
-    public get marketName(): string {
-        return this.marketNameElement.textContent.trim();
+        this.marketName = this.element.querySelector(selector.marketNameCell).textContent.trim();
+        this.profitElement = this.element.querySelector(selector.profitCell);
+        this.gainElement = this.element.querySelector(selector.gainCell);
     }
 
     public get profit(): number {
@@ -31,14 +36,5 @@ export class PortfolioListRow {
 
     public get gain(): number {
         return parseFloat(this.gainElement.textContent);
-    }
-
-    public static parseAll(tableBodyElement: Element): PortfolioListRow[] {
-        if (!tableBodyElement.matches(this.tableBodySelector))
-            throw new Error("Element doesn't match a tableBody.");
-
-        return Array.from(
-            tableBodyElement.querySelectorAll(PortfolioListRow.selector),
-            elem => new PortfolioListRow(elem));
     }
 }

@@ -11,8 +11,10 @@ export class PortfolioListView {
             throw new Error("Element doesn't match a PortfolioListView.");
 
         this.element = element;
-        this.rows = PortfolioListRow
-            .parseAll(element.querySelector(PortfolioListRow.tableBodySelector));
+
+        this.rows = Array.from(
+            element.querySelectorAll("ui-table-body > " + PortfolioListRow.elementSelector),
+            elem => new PortfolioListRow(elem));
     }
 
 }
