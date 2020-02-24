@@ -5,9 +5,9 @@ console.log('eToro Delta loaded.');
 const uiLayout = new UiLayout(document.querySelector(UiLayout.selector));
 
 uiLayout.portfolioListViewAdded.attach(plv => {
-	console.log("Portfolio added");
+	console.debug("Portfolio added.");
 })
 
 uiLayout.portfolioListViewRemoved.attach(plv => {
-	console.log("Portfolio removed.");
+	console.debug("Portfolio removed.");
 })

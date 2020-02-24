@@ -15,7 +15,7 @@ export class CellDelta {
     }
 
     public set value(value: number) {
-        this.element.childNodes[1].textContent = value.toFixed(2);
-        this.element.className = value >= 0 ? "positive" : "negative";
+        this.element.childNodes[1].textContent = value == 0 ? "-" : value.toFixed(2);
+        this.element.className = value > 0 ? "positive" : (value < 0 ? "negative" : "dark");
     }
 }
