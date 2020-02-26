@@ -31,7 +31,7 @@ export class PortfolioListRow {
     public set compareSnapshot(snapshot: PortfolioListRowSnapshot | null) {
         var cellKey: keyof PortfolioListRowCells;
         for (cellKey in this.cells)
-            this.cells[cellKey].compareSnapshot = snapshot[cellKey];
+            this.cells[cellKey].compareSnapshot = snapshot == null ? null : snapshot[cellKey];
     }
 
     public get marketName(): string {

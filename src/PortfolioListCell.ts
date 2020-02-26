@@ -24,13 +24,15 @@ export class PortfolioListCell {
     private readonly compareObserver: MutationObserver;
 
     constructor(parentElement: Element, name: string, valueName?: string, compareEnabled: boolean = true) {
-        this.element = parentElement.querySelector(selector.cellContainer(name));
-        if (!this.element)
+        const element = parentElement.querySelector(selector.cellContainer(name));
+        const valueElement = this.element.querySelector(selector.cell(valueName ?? name));
+        if (!element || !valueElement || valueElement.textContent == null)
             throw new Error("No element found that matches a PortfolioListCell.");
 
+        this.element = element;
+        this.valueElement = valueElement;``
         this.compareEnabled = compareEnabled;
-        this.valueElement = this.element.querySelector(selector.cell(valueName ?? name));
-        this.compareObserver = new MutationObserver((m, o) => this.onValueChanged(m, o));
+        this.compareObserver = new MutationObserver((m, o) => this.onDeltaChanged(m, o));
     }
 
     private get compareValue(): number | null {
@@ -65,20 +67,20 @@ export class PortfolioListCell {
     }
 
     public get valueString(): string {
-        return this.valueElement.textContent.trim();
+        return this.valueElement.textContent!.trim();
     }
 
     public static elementSelector(name: string): string {
         return selector.cellContainer(name);
     }
 
-    private onValueChanged(_m: MutationRecord[], _o: MutationObserver) {
-        if (this.cellDelta != null)
-            this.cellDelta.value = this.value - this.compareValue;
+    private onDeltaChanged(_m: MutationRecord[], _o: MutationObserver) {
+        if (this.compareEnabled && this.cellDelta != null)
+            this.cellDelta.value = this.compareValue == null ? 0 : this.value - this.compareValue;
     }
 
     public set compareSnapshot(snapshot: PortfolioListCellSnapshot | null) {
-        const valueOrNot = parseFloat(snapshot);
+        const valueOrNot = snapshot ? parseFloat(snapshot) : NaN;
         this.compareValue = valueOrNot == NaN ? null : valueOrNot;
     }
 

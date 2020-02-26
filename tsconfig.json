@@ -6,6 +6,7 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "noImplicitAny": true,
+        "strictNullChecks": true,
         "removeComments": true,
         "sourceMap": true
     },

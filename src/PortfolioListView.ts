@@ -31,7 +31,7 @@ export class PortfolioListView {
     public set compareSnapshot(snapshot: PortfolioListViewSnapshot | null) {
         var key: keyof PortfolioListRows;
         for (key in this.rows)
-            this.rows[key].compareSnapshot = snapshot[key];
+            this.rows[key].compareSnapshot = snapshot == null ? null : snapshot[key];
     }
 
     public createSnapshot(): PortfolioListViewSnapshot {
