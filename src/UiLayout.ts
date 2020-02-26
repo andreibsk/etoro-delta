@@ -24,7 +24,7 @@ export class UiLayout {
         if (portfolioElement)
             this.portfolioListView = new PortfolioListView(portfolioElement);
         else
-            this.observer.observe(this.element, UiLayout.observerOptions)
+            this.observer.observe(this.element, UiLayout.observerOptions);
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {

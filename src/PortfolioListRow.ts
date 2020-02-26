@@ -1,27 +1,50 @@
-import { PortfolioListCell } from "./PortfolioListCell";
+import { PortfolioListCell, PortfolioListCellSnapshot } from "./PortfolioListCell";
+
+type PortfolioListRowCells = {
+    marketName: PortfolioListCell,
+    profit: PortfolioListCell,
+    gain: PortfolioListCell
+};
+
+export type PortfolioListRowSnapshot = {
+    [P in keyof PortfolioListRowCells]: PortfolioListCellSnapshot;
+};
 
 export class PortfolioListRow {
     public static readonly elementSelector: string = ".ui-table-row-container";
 
     private readonly element: Element;
-    private readonly marketNameCell: PortfolioListCell;
-    private readonly profitCell: PortfolioListCell;
-    private readonly gainCell: PortfolioListCell;
+    private readonly cells: Readonly<PortfolioListRowCells>;
 
     constructor(element: Element) {
         if (!element.matches(PortfolioListRow.elementSelector))
             throw new Error("Element doesn't match a PortfolioListRow.");
 
         this.element = element;
-        this.marketNameCell = new PortfolioListCell(this.element, "action", "market-name");
-        this.profitCell = new PortfolioListCell(this.element, "container-profit", "profit");
-        this.gainCell = new PortfolioListCell(this.element, "gain");
+        this.cells = {
+            marketName: new PortfolioListCell(this.element, "action", "market-name", false),
+            profit: new PortfolioListCell(this.element, "container-profit", "profit"),
+            gain: new PortfolioListCell(this.element, "gain")
+        };
+    }
 
-        this.profitCell.compareValue = this.profitCell.value;
-        this.gainCell.compareValue = this.gainCell.value;
+    public set compareSnapshot(snapshot: PortfolioListRowSnapshot | null) {
+        var cellKey: keyof PortfolioListRowCells;
+        for (cellKey in this.cells)
+            this.cells[cellKey].compareSnapshot = snapshot[cellKey];
     }
 
     public get marketName(): string {
-        return this.marketNameCell.valueString;
+        return this.cells.marketName.valueString;
+    }
+
+    public createSnapshot(): PortfolioListRowSnapshot {
+        var snapshot: Partial<PortfolioListRowSnapshot> = {};
+
+        var key: keyof PortfolioListRowCells;
+        for (key in this.cells)
+            snapshot[key] = this.cells[key].createSnapshot();
+
+        return  snapshot as PortfolioListRowSnapshot;
     }
 }
