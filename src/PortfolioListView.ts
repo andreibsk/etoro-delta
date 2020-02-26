@@ -8,14 +8,14 @@ export type PortfolioListViewSnapshot = {
     [P in keyof PortfolioListRows]: PortfolioListRowSnapshot;
 }
 
-export class PortfolioListView {
-    public static readonly selector: string = "portfolio-list-view";
+export class Portfolio {
+    public static readonly selector: string = ".p-portfolio";
     public readonly element: Element;
 
     private readonly rows: PortfolioListRows;
 
     constructor(element: Element) {
-        if (!element.matches(PortfolioListView.selector))
+        if (!element.matches(Portfolio.selector))
             throw new Error("Element doesn't match a PortfolioListView.");
 
         this.element = element;

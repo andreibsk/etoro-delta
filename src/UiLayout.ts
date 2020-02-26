@@ -1,4 +1,4 @@
-import { PortfolioListView } from "./PortfolioListView";
+import { Portfolio } from "./PortfolioListView";
 import { SyncEvent } from "ts-events";
 import { filter } from "./Utils";
 
@@ -8,10 +8,10 @@ export class UiLayout {
 
     private readonly element: Element;
     private readonly observer: MutationObserver;
-    private portfolioListView?: PortfolioListView;
+    private portfolio?: Portfolio;
 
-    public readonly portfolioListViewAdded = new SyncEvent<PortfolioListView>();
-    public readonly portfolioListViewRemoved = new SyncEvent<PortfolioListView>();
+    public readonly portfolioAdded = new SyncEvent<Portfolio>();
+    public readonly portfolioRemoved = new SyncEvent<Portfolio>();
 
     constructor(element: Element) {
         if (!element.matches(UiLayout.selector))
@@ -20,23 +20,23 @@ export class UiLayout {
         this.element = element;
         this.observer = new MutationObserver(m => this.onMutationObserved(m));
 
-        const portfolioElement = element.querySelector(PortfolioListView.selector);
+        const portfolioElement = element.querySelector(Portfolio.selector);
         if (portfolioElement)
-            this.portfolioListView = new PortfolioListView(portfolioElement);
+            this.portfolio = new Portfolio(portfolioElement);
         else
             this.observer.observe(this.element, UiLayout.observerOptions);
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {
-        for (const mutation of filter(mutations, PortfolioListView.selector)) {
-            if (mutation?.added == true && mutation.element != this.portfolioListView?.element) {
-                this.portfolioListView = new PortfolioListView(mutation.element);
-                this.portfolioListViewAdded.post(this.portfolioListView);
+        for (const mutation of filter(mutations, Portfolio.selector)) {
+            if (mutation?.added == true && mutation.element != this.portfolio?.element) {
+                this.portfolio = new Portfolio(mutation.element);
+                this.portfolioAdded.post(this.portfolio);
             }
-            else if (mutation?.added == false && this.portfolioListView != undefined) {
-                const view = this.portfolioListView;
-                this.portfolioListView = undefined;
-                this.portfolioListViewRemoved.post(view);
+            else if (mutation?.added == false && this.portfolio != undefined) {
+                const view = this.portfolio;
+                this.portfolio = undefined;
+                this.portfolioRemoved.post(view);
             }
         }
     }

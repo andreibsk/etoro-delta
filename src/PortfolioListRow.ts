@@ -45,6 +45,6 @@ export class PortfolioListRow {
         for (key in this.cells)
             snapshot[key] = this.cells[key].createSnapshot();
 
-        return  snapshot as PortfolioListRowSnapshot;
+        return snapshot as PortfolioListRowSnapshot;
     }
 }

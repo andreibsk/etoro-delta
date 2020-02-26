@@ -25,7 +25,7 @@ export class PortfolioListCell {
 
     constructor(parentElement: Element, name: string, valueName?: string, compareEnabled: boolean = true) {
         const element = parentElement.querySelector(selector.cellContainer(name));
-        const valueElement = this.element.querySelector(selector.cell(valueName ?? name));
+        const valueElement = element?.querySelector(selector.cell(valueName ?? name));
         if (!element || !valueElement || valueElement.textContent == null)
             throw new Error("No element found that matches a PortfolioListCell.");
 
