@@ -1,4 +1,4 @@
-import { Portfolio } from "./PortfolioListView";
+import { Portfolio } from "./Portfolio";
 import { SyncEvent } from "ts-events";
 import { filter } from "./Utils";
 
