@@ -1,7 +1,9 @@
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import * as path from 'path';
-import { ConfigurationFactory } from 'webpack';
+import { ConfigurationFactory, WatchIgnorePlugin } from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import WebpackShellPluginNext from 'webpack-shell-plugin-next';
 const ExtensionReloader = require('webpack-extension-reloader');
 
 const config: ConfigurationFactory = (_env, argv) => {
@@ -22,7 +24,7 @@ const config: ConfigurationFactory = (_env, argv) => {
             path: path.resolve(__dirname, 'dist/')
         },
         resolve: {
-            extensions: ['.tsx', '.ts', '.js'],
+            extensions: ['.tsx', '.ts', '.js', '.scss'],
         },
         module: {
             rules: [
@@ -38,13 +40,41 @@ const config: ConfigurationFactory = (_env, argv) => {
                         }
                     ]
                 },
+                {
+                    test: /\.scss$/,
+                    include: path.resolve(__dirname, 'src/'),
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                importLoaders: 1,
+                                sourceMap: devMode,
+                                modules: {
+                                    localIdentName: "[name]__[local]___[hash:base64:5]",
+                                },
+                                localsConvention: 'camelCaseOnly',
+                            }
+                        },
+                        'sass-loader'
+                    ]
+                }
             ],
         },
         plugins: [
             new CopyWebpackPlugin([{ from: './src/manifest.json' }]),
-            new ForkTsCheckerWebpackPlugin(),
+            new MiniCssExtractPlugin(),
+            new ForkTsCheckerWebpackPlugin({ async: false }),
+            new WatchIgnorePlugin([/scss\.d\.ts$/]),
             ...(devMode
-                ? [new ExtensionReloader({ manifest: path.resolve(__dirname, "src", "manifest.json") })]
+                ? [
+                    new ExtensionReloader({ manifest: path.resolve(__dirname, "src", "manifest.json") }),
+                    new WebpackShellPluginNext({
+                        onBuildEnd: {
+                            scripts: [ 'npx tsm -e default --watch --ignoreInitial src' ],
+                            parallel: true
+                        }
+                    })]
                 : [])
         ]
     };
