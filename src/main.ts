@@ -1,5 +1,5 @@
 import { UiLayout } from "./UiLayout";
-import { Portfolio, PortfolioListViewSnapshot } from "./Portfolio";
+import { Portfolio } from "./Portfolio";
 import { storage, Snapshot } from "./Storage";
 import { Header } from "./Header";
 

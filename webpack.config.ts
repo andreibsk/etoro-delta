@@ -2,7 +2,6 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
-import tsNameof from "ts-nameof";
 import WebpackShellPluginNext from 'webpack-shell-plugin-next';
 import { ConfigurationFactory, WatchIgnorePlugin } from 'webpack';
 const ExtensionReloader = require('webpack-extension-reloader');
@@ -36,8 +35,7 @@ const config: ConfigurationFactory = (_env, argv) => {
                         {
                             loader: 'ts-loader',
                             options: {
-                                transpileOnly: true,
-                                getCustomTransformers: () => ({ before: [tsNameof] })
+                                transpileOnly: true
                             }
                         }
                     ]
