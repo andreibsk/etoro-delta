@@ -1,41 +1,68 @@
 import { UiLayout } from "./UiLayout";
 import { Portfolio, PortfolioListViewSnapshot } from "./Portfolio";
 import { storage } from "./Storage";
+import { Header } from "./Header";
 
 console.log('eToro Delta loaded.');
 
 const uiLayout = new UiLayout(document.querySelector(UiLayout.selector)!);
+let header: Header;
+let portfolio: Portfolio | null = null;
+let selectedSnapshot: PortfolioListViewSnapshot | null = null;
+
+uiLayout.headerRemoved.attach(() => console.debug("Header removed."));
 
 uiLayout.portfolioAdded.attach(async (p: Portfolio) => {
 	console.debug("Portfolio added.");
-
-	p.header.customHeaderItem.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest(p));
-	p.header.customHeaderItem.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(p, d));
-	p.header.customHeaderItem.snapshotDates = await storage.getSnapshotDates();
-	p.header.customHeaderItem.selectedSnapshotDate = await storage.getSelectedSnapshotDate();
+	console.assert(header, "Portfolio mounted before the header.");
+	portfolio = p;
+	portfolio.compareSnapshot = selectedSnapshot;
 });
-
 uiLayout.portfolioRemoved.attach(() => {
 	console.debug("Portfolio removed.");
+	portfolio = null;
 });
 
-async function onCreateSnapshotRequest(portfolio: Portfolio) {
+uiLayout.headerAdded.attach(async (h: Header) => {
+	console.debug("Header added.");
+	header = h;
+
+	const selectedSnapshotDate = await storage.getSelectedSnapshotDate();
+
+	header.controlPanel.snapshotDates = await storage.getSnapshotDates();
+	header.controlPanel.selectedSnapshotDate = selectedSnapshotDate;
+	header.controlPanel.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest());
+	header.controlPanel.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(d));
+	
+	await onSelectedSnapshotDateChange(selectedSnapshotDate, false);
+});
+
+async function onCreateSnapshotRequest() {
 	console.debug("Create snapshot requested.");
 
-	const snapshot = portfolio.createSnapshot();
+	if (!portfolio) {
+		console.log("Creating snapshot on pages other than portfolio is not supported.");
+		return;
+	}
 
+	const snapshot = portfolio.createSnapshot();
 	const snapshotDate = await storage.addSnapshot(snapshot);
-	portfolio.header.customHeaderItem.addSnapshotDate(snapshotDate);
-	console.debug("Snapshot saved:", snapshot);
+	header.controlPanel.addSnapshotDate(snapshotDate);
+	console.debug(`Snapshot saved (${snapshotDate.toLocaleString()}):`, snapshot);
 }
 
-async function onSelectedSnapshotDateChange(portfolio: Portfolio, date: Date | null) {
+async function onSelectedSnapshotDateChange(date: Date | null, save: boolean = true) {
 	console.debug("Selected snapshot date:", date === null ? null : date.toLocaleString());
 
 	const snapshot = date === null ? null : await storage.getSnapshot<PortfolioListViewSnapshot>(date);
 	if (snapshot === undefined)
 		throw new Error(`No snapshot found for date: ${date!.toLocaleString()}`);
 
-	portfolio.compareSnapshot = snapshot;
-	await storage.setSelectedSnapshotDate(date);
+	selectedSnapshot = snapshot;
+
+	if (portfolio)
+		portfolio.compareSnapshot = selectedSnapshot;
+
+	if (save)
+		await storage.setSelectedSnapshotDate(date);
 }

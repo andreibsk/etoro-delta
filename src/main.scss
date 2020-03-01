@@ -1,12 +1,12 @@
-.portfolio-header-custom-item {
-    display: inline-block;
+.header-control-panel {
+    display: inline-flex;
+    height: 100%;
+    padding: 0 13px;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
 
-    &::before {
-        content: "";
-        position: absolute;
-        height: 57px;
-        border-right: 1px solid #e0e0e0;
-        top: 1px;
-        left: -2px;
-    }
+.control-panel-actions-row {
+    display: flex;
+    justify-content: space-around;
 }

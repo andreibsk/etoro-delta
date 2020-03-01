@@ -1,5 +1,4 @@
 import { PortfolioListRow, PortfolioListRowSnapshot } from "./PortfolioListRow";
-import { PortfolioHeader } from "./PortfolioHeader";
 
 type PortfolioListRows = {
     [key: string]: PortfolioListRow
@@ -13,7 +12,6 @@ export class Portfolio {
     public static readonly selector: string = ".p-portfolio";
 
     public readonly element: Element;
-    public readonly header: PortfolioHeader;
 
     private readonly rows: PortfolioListRows;
 
@@ -22,7 +20,6 @@ export class Portfolio {
             throw new Error("Element doesn't match a PortfolioListView.");
 
         this.element = element;
-        this.header = new PortfolioHeader(element.querySelector(PortfolioHeader.elementSelector)!);
 
         this.rows = {};
         const rowElements = element.querySelectorAll("ui-table-body > " + PortfolioListRow.elementSelector);

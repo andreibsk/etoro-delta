@@ -1,7 +1,7 @@
 import styles from "./main.scss"
 import { SyncEvent } from "ts-events";
 
-export class PortfolioHeaderCustomItem {
+export class HeaderControlPanel {
     public readonly element: Element;
     public readonly onCreateSnapshotRequest = new SyncEvent<void>();
     public readonly onSelectedSnapshotDateChange = new SyncEvent<Date | null>();
@@ -20,13 +20,23 @@ export class PortfolioHeaderCustomItem {
         this.snapshotDateSelectElement.onchange = () => this.snapshotDateSelectElementValueChanged();
 
         const createSnapshotButton = document.createElement("button");
-        createSnapshotButton.innerText = "NEW";
+        createSnapshotButton.innerText = "Create";
         createSnapshotButton.onclick = () => this.onCreateSnapshotRequest.post();
 
+        const deleteSnapshotButton = document.createElement("button");
+        deleteSnapshotButton.innerText = "Delete";
+        deleteSnapshotButton.disabled = true;
+        // deleteSnapshotButton.onclick = () => this.onCreateSnapshotRequest.post();
+
+        const actionsRow = document.createElement("div");
+        actionsRow.className = styles.controlPanelActionsRow;
+        actionsRow.appendChild(createSnapshotButton);
+        actionsRow.appendChild(deleteSnapshotButton);
+
         this.element = document.createElement("div");
-        this.element.className = styles.portfolioHeaderCustomItem;
+        this.element.className = styles.headerControlPanel;
         this.element.appendChild(this.snapshotDateSelectElement);
-        this.element.appendChild(createSnapshotButton);
+        this.element.appendChild(actionsRow);
     }
 
     public set selectedSnapshotDate(date: Date | null) {
