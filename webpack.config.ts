@@ -51,7 +51,7 @@ const config: ConfigurationFactory = (_env, argv) => {
                                 importLoaders: 1,
                                 sourceMap: devMode,
                                 modules: {
-                                    localIdentName: "[name]__[local]___[hash:base64:5]",
+                                    localIdentName: "[local]__[hash:base64:5]",
                                 },
                                 localsConvention: 'camelCaseOnly',
                             }
