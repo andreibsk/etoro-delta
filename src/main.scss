@@ -1,3 +1,12 @@
-.test {
-    background-color: red;
+.portfolio-header-custom-item {
+    display: inline-block;
+
+    &::before {
+        content: "";
+        position: absolute;
+        height: 57px;
+        border-right: 1px solid #e0e0e0;
+        top: 1px;
+        left: -2px;
+    }
 }
