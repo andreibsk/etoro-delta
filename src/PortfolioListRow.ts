@@ -6,9 +6,9 @@ type PortfolioListRowCells = {
     gain: PortfolioListCell
 };
 
-export type PortfolioListRowSnapshot = {
+export type PortfolioListRowSnapshot = Omit<{
     [P in keyof PortfolioListRowCells]: PortfolioListCellSnapshot;
-};
+}, "marketName">;
 
 export class PortfolioListRow {
     public static readonly elementSelector: string = ".ui-table-row-container";
@@ -31,7 +31,12 @@ export class PortfolioListRow {
     public set compareSnapshot(snapshot: PortfolioListRowSnapshot | null) {
         var cellKey: keyof PortfolioListRowCells;
         for (cellKey in this.cells)
+        {
+            if (cellKey == "marketName")
+                continue;
+
             this.cells[cellKey].compareSnapshot = snapshot == null ? null : snapshot[cellKey];
+        }
     }
 
     public get marketName(): string {
@@ -42,8 +47,12 @@ export class PortfolioListRow {
         var snapshot: Partial<PortfolioListRowSnapshot> = {};
 
         var key: keyof PortfolioListRowCells;
-        for (key in this.cells)
+        for (key in this.cells) {
+            if (key == "marketName")
+                continue;
+
             snapshot[key] = this.cells[key].createSnapshot();
+        }
 
         return snapshot as PortfolioListRowSnapshot;
     }
