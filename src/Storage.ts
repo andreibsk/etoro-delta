@@ -20,7 +20,7 @@ class SyncStorage {
         return storageItems[snapshotKey];
     }
 
-    public async addSnapshot<TSnapshot>(snapshot: TSnapshot): Promise<void> {
+    public async addSnapshot<TSnapshot>(snapshot: TSnapshot): Promise<Date> {
         const date = new Date();
 
         const snapshotDateTimes = await this.getSnapshotDateTimes();
@@ -32,6 +32,8 @@ class SyncStorage {
             [key.snapshotDates]: snapshotDateTimes,
             [snapshotKey]: snapshot
         });
+
+        return date;
     }
 
     private async getSnapshotDateTimes(): Promise<number[]> {
