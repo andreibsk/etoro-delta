@@ -12,7 +12,7 @@ const selector = {
     cellContainer: (s: string) => `[${eIdAttributeName}='${cellContainerPrefix}${s}']`
 };
 
-export type PortfolioListCellSnapshot = string;
+export type PortfolioListCellSnapshot = number;
 
 export class PortfolioListCell {
     private readonly element: Element;
@@ -30,7 +30,7 @@ export class PortfolioListCell {
             throw new Error("No element found that matches a PortfolioListCell.");
 
         this.element = element;
-        this.valueElement = valueElement;``
+        this.valueElement = valueElement;
         this.compareEnabled = compareEnabled;
         this.compareObserver = new MutationObserver((m, o) => this.onDeltaChanged(m, o));
     }
@@ -80,11 +80,10 @@ export class PortfolioListCell {
     }
 
     public set compareSnapshot(snapshot: PortfolioListCellSnapshot | null) {
-        const valueOrNot = snapshot ? parseFloat(snapshot) : NaN;
-        this.compareValue = valueOrNot == NaN ? null : valueOrNot;
+        this.compareValue = snapshot;
     }
 
     public createSnapshot(): PortfolioListCellSnapshot {
-        return this.value == NaN ? this.valueString : this.value.toString();
+        return this.value;
     }
 }
