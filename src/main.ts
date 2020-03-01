@@ -12,6 +12,7 @@ uiLayout.portfolioAdded.attach(async (p: Portfolio) => {
 	p.header.customHeaderItem.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest(p));
 	p.header.customHeaderItem.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(p, d));
 	p.header.customHeaderItem.snapshotDates = await storage.getSnapshotDates();
+	p.header.customHeaderItem.selectedSnapshotDate = await storage.getSelectedSnapshotDate();
 });
 
 uiLayout.portfolioRemoved.attach(() => {
@@ -29,11 +30,12 @@ async function onCreateSnapshotRequest(portfolio: Portfolio) {
 }
 
 async function onSelectedSnapshotDateChange(portfolio: Portfolio, date: Date | null) {
-	console.debug("Selected snapshot date change:", date === null ? null : date.toLocaleString());
+	console.debug("Selected snapshot date:", date === null ? null : date.toLocaleString());
 
 	const snapshot = date === null ? null : await storage.getSnapshot<PortfolioListViewSnapshot>(date);
 	if (snapshot === undefined)
 		throw new Error(`No snapshot found for date: ${date!.toLocaleString()}`);
 
 	portfolio.compareSnapshot = snapshot;
+	await storage.setSelectedSnapshotDate(date);
 }

@@ -2,6 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 
 const key = {
     snapshotDates: "snapshotDates",
+    selectedSnapshotDate: "selectedSnapshotDate",
     
 	snapshotPrefix: "snapshot.",
 	snapshot: (date: Date) => "snapshot." + date.getTime()
@@ -34,6 +35,15 @@ class SyncStorage {
         });
 
         return date;
+    }
+
+    public async setSelectedSnapshotDate(date: Date | null) {
+        return await browser.storage.sync.set({ [key.selectedSnapshotDate]: date === null ? null : date.getTime() });
+    }
+
+    public async getSelectedSnapshotDate(): Promise<Date | null> {
+        const storageItems = await browser.storage.sync.get(key.selectedSnapshotDate);
+        return storageItems[key.selectedSnapshotDate] ? new Date(storageItems[key.selectedSnapshotDate]) : null;
     }
 
     private async getSnapshotDateTimes(): Promise<number[]> {

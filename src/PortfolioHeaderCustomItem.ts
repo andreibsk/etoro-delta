@@ -29,6 +29,20 @@ export class PortfolioHeaderCustomItem {
         this.element.appendChild(createSnapshotButton);
     }
 
+    public set selectedSnapshotDate(date: Date | null) {
+        const val = date === null ? "" : date.getTime().toString();
+        
+        for (let i = 0; i < this.snapshotDateSelectElement.options.length; i++) {
+            const opt = this.snapshotDateSelectElement.options[i];
+            
+            if (opt.value === val) {
+                this.snapshotDateSelectElement.selectedIndex = i;
+                this.snapshotDateSelectElementValueChanged();
+                break;
+            }
+        }
+    }
+
     public set snapshotDates(dates: Date[]) {
         while (this.snapshotDateSelectElement.lastChild != this.snapshotDateDefaultOptionElement)
             this.snapshotDateSelectElement.lastChild!.remove();
