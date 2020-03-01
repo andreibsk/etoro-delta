@@ -24,6 +24,7 @@
     "ts-node": "^8.6.2",
     "typed-scss-modules": "^1.2.0",
     "typescript": "^3.8.2",
+    "webextension-polyfill-ts": "^0.12.0",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",
     "webpack-extension-reloader": "^1.1.4",
