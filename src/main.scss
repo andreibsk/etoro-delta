@@ -20,8 +20,8 @@
     margin: 2px 3px;
     width: 0;
     height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
 
     opacity: 0;
     animation: signfade .7s linear forwards;
@@ -35,10 +35,10 @@
 
 .arrow-sign-positive {
     @include arrow-sign;
-    border-bottom: 4px solid #6bad10;
+    border-bottom: 5px solid #6bad10;
 }
 
 .arrow-sign-negative {
     @include arrow-sign;
-    border-top: 4px solid #d0021b;
+    border-top: 5px solid #d0021b;
 }
