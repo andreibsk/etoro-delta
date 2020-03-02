@@ -2,7 +2,7 @@ import { PortfolioListRow, PortfolioListRowSnapshot } from "./PortfolioListRow";
 import { filter } from "./Utils";
 
 const selector = {
-    element: ".p-portfolio",
+    element: "portfolio-list-view",
     uiTableBody: "ui-table-body"
 }
 

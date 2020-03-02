@@ -41,11 +41,11 @@ export class UiLayout {
             const element = mutation.element;
 
             if (element.matches(Portfolio.selector)) {
-                if (mutation.added == true && element != this.portfolio?.element) {
+                if (mutation.added == true && !this.portfolio) {
                     this.portfolio = new Portfolio(element);
                     this.portfolioAdded.post(this.portfolio);
                 }
-                else if (mutation.added == false && this.portfolio != undefined) {
+                else if (mutation.added == false && this.portfolio) {
                     const view = this.portfolio;
                     this.portfolio = undefined;
                     this.portfolioRemoved.post(view);
