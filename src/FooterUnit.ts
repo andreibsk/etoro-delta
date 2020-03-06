@@ -18,9 +18,10 @@ export class FooterUnit {
 
     private delta: Delta | null;
     private _compareValue: number | null = null;
+    private readonly displayPercent: boolean;
     private readonly compareObserver: MutationObserver;
 
-    constructor(parentElement: Element, name: string) {
+    constructor(parentElement: Element, name: string, displayPercent?: boolean) {
         const element = parentElement.querySelector(selector.element + selector.unit(name));
         const valueElement = element?.querySelector(selector.valueElement);
 
@@ -29,6 +30,7 @@ export class FooterUnit {
 
         this.element = element;
         this.valueElement = valueElement;
+        this.displayPercent = displayPercent ?? false;
         this.compareObserver = new MutationObserver((m, o) => this.onDeltaChanged(m, o));
     }
 
@@ -46,7 +48,10 @@ export class FooterUnit {
                 this.delta = new Delta();
                 this.element.insertBefore(this.delta.element, this.valueElement.nextSibling);
             }
-            this.delta.value = this.value - value;
+
+            this.delta.value = this.compareValue == null ? 0 : this.value - this._compareValue!;
+            if (this.displayPercent)
+                this.delta.percentValue = (this.value - this._compareValue!) * 100 / this._compareValue!;
         }
         else {
             if (this.delta != null) {
@@ -65,8 +70,11 @@ export class FooterUnit {
     }
 
     private onDeltaChanged(_m: MutationRecord[], _o: MutationObserver) {
-        if (this.delta != null)
-            this.delta.value = this.compareValue == null ? 0 : this.value - this.compareValue;
+        if (this.delta != null) {
+            this.delta.value = this.compareValue == null ? 0 : this.value - this._compareValue!;
+            if (this.displayPercent)
+                this.delta.percentValue = (this.value - this._compareValue!) * 100 / this._compareValue!;
+        }
     }
 
     public set compareSnapshot(snapshot: FooterUnitSnapshot | null) {

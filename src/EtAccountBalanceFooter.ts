@@ -21,7 +21,7 @@ export class EtAccountBalanceFooter {
         this.element = element;
         this.units = {
             profit: new FooterUnit(element, "profit-unit"),
-            total: new FooterUnit(element, "amount-total")
+            total: new FooterUnit(element, "amount-total", true)
         };
     }
 
