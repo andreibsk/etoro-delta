@@ -2,6 +2,7 @@ import { Portfolio } from "./Portfolio";
 import { SyncEvent } from "ts-events";
 import { filter } from "./Utils";
 import { Header } from "./Header";
+import { EtAccountBalanceFooter } from "./EtAccountBalanceFooter";
 
 export class UiLayout {
     public static readonly selector: string = "ui-layout";
@@ -11,12 +12,16 @@ export class UiLayout {
     private readonly observer: MutationObserver;
     private portfolio?: Portfolio;
     private header?: Header;
+    private footer?: EtAccountBalanceFooter;
 
     public readonly portfolioAdded = new SyncEvent<Portfolio>();
     public readonly portfolioRemoved = new SyncEvent<Portfolio>();
 
     public readonly headerAdded = new SyncEvent<Header>();
     public readonly headerRemoved = new SyncEvent<Header>();
+
+    public readonly footerAdded = new SyncEvent<EtAccountBalanceFooter>();
+    public readonly footerRemoved = new SyncEvent<EtAccountBalanceFooter>();
 
     constructor(element: Element) {
         if (!element.matches(UiLayout.selector))
@@ -33,11 +38,15 @@ export class UiLayout {
         if (headerElement)
             this.header = new Header(headerElement);
 
+        const footerElement = element.querySelector(EtAccountBalanceFooter.selector);
+        if (footerElement)
+            this.footer = new EtAccountBalanceFooter(footerElement);
+
         this.observer.observe(this.element, UiLayout.observerOptions);
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {
-        for (const mutation of filter(mutations, Portfolio.selector, Header.selector)) {
+        for (const mutation of filter(mutations, Portfolio.selector, Header.selector, EtAccountBalanceFooter.selector)) {
             const element = mutation.element;
 
             if (element.matches(Portfolio.selector)) {
@@ -46,9 +55,9 @@ export class UiLayout {
                     this.portfolioAdded.post(this.portfolio);
                 }
                 else if (mutation.added == false && this.portfolio) {
-                    const view = this.portfolio;
+                    const obj = this.portfolio;
                     this.portfolio = undefined;
-                    this.portfolioRemoved.post(view);
+                    this.portfolioRemoved.post(obj);
                 }
             }
             else if (element.matches(Header.selector)) {
@@ -57,9 +66,20 @@ export class UiLayout {
                     this.headerAdded.post(this.header);
                 }
                 else if (mutation.added == false && this.header != undefined) {
-                    const view = this.header;
+                    const obj = this.header;
                     this.header = undefined;
-                    this.headerRemoved.post(view);
+                    this.headerRemoved.post(obj);
+                }
+            }
+            else if (element.matches(EtAccountBalanceFooter.selector)) {
+                if (mutation.added == true && element != this.footer?.element) {
+                    this.footer = new EtAccountBalanceFooter(element);
+                    this.footerAdded.post(this.footer);
+                }
+                else if (mutation.added == false && this.footer != undefined) {
+                    const obj = this.footer;
+                    this.footer = undefined;
+                    this.footerRemoved.post(obj);
                 }
             }
         }

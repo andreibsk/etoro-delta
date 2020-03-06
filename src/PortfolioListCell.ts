@@ -1,4 +1,4 @@
-import { CellDelta } from "./CellDelta";
+import { Delta } from "./Delta";
 
 const cellPrefix: string = "portfolio-overview-table-body-cell";
 const cellContainerPrefix: string = "portfolio-overview-table-cell-container-";
@@ -18,7 +18,7 @@ export class PortfolioListCell {
     private readonly element: Element;
     private readonly valueElement: Element;
 
-    private cellDelta: CellDelta | null;
+    private cellDelta: Delta | null;
     private _compareValue: number | null = null;
     private readonly compareEnabled: boolean;
     private readonly compareObserver: MutationObserver;
@@ -49,7 +49,7 @@ export class PortfolioListCell {
         if (value != null) {
             this.compareObserver.observe(this.valueElement, valueObserveOptions);
             if (this.cellDelta == null) {
-                this.cellDelta = new CellDelta();
+                this.cellDelta = new Delta();
                 this.element.appendChild(this.cellDelta.element);
             }
             this.cellDelta.value = this.value - value;
@@ -63,7 +63,7 @@ export class PortfolioListCell {
     }
 
     public get value(): number {
-        return parseFloat(this.valueString.replace(/[$%<>]/, ""));
+        return parseFloat(this.valueString.replace(/[$%<>]/g, ""));
     }
 
     public get valueString(): string {

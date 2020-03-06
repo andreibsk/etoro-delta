@@ -1,6 +1,6 @@
 import styles from "./main.scss";
 
-export class CellDelta {
+export class Delta {
     public readonly element: Element;
 
     private _value: number = 0.00;

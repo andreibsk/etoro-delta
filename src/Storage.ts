@@ -1,12 +1,14 @@
 import { browser } from "webextension-polyfill-ts";
 import { PortfolioListViewSnapshot } from "./Portfolio";
+import { AccountSnapshot } from "./EtAccountBalanceFooter";
 
 function snapshotKey(date: Date): number {
     return date.getTime();
 }
 
 export type Snapshot = {
-	portfolio: PortfolioListViewSnapshot
+    account: AccountSnapshot,
+    portfolio: PortfolioListViewSnapshot
 }
 
 type StorageModel = {

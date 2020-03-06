@@ -42,3 +42,11 @@
     @include arrow-sign;
     border-top: 5px solid #d0021b;
 }
+
+:global {
+    .footer-unit {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+}
