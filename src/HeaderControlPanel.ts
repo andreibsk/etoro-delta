@@ -57,7 +57,7 @@ export class HeaderControlPanel {
         while (this.snapshotDateSelectElement.lastChild != this.snapshotDateDefaultOptionElement)
             this.snapshotDateSelectElement.lastChild!.remove();
 
-        for (const date of dates.sort().reverse()) {
+        for (const date of dates.sort((a, b) => b.getTime() - a.getTime())) {
             const option = document.createElement("option");
             option.value = date.getTime().toString();
             option.text = date.toLocaleString();
