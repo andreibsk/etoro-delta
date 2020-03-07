@@ -62,7 +62,10 @@ const config: ConfigurationFactory = (_env, argv) => {
             ],
         },
         plugins: [
-            new CopyWebpackPlugin([{ from: './src/manifest.json' }]),
+            new CopyWebpackPlugin([
+                'src/manifest.json',
+                { from: 'src/images/*.png', to: 'images/[name].[ext]' }
+            ]),
             new MiniCssExtractPlugin(),
             new ForkTsCheckerWebpackPlugin({ async: false }),
             new WatchIgnorePlugin([/scss\.d\.ts$/]),
