@@ -1,8 +1,8 @@
 import { UiLayout } from "./UiLayout";
-import { Portfolio } from "./Portfolio";
+import { Portfolio } from "./portfolio";
 import { storage, Snapshot } from "./Storage";
-import { Header } from "./Header";
-import { EtAccountBalanceFooter } from "./EtAccountBalanceFooter";
+import { Header } from "./header";
+import { EtAccountBalanceFooter } from "./footer";
 
 console.log('eToro Delta loaded.');
 

@@ -1,4 +1,4 @@
-import { Delta } from "./Delta";
+import { Delta } from "../Delta";
 
 const cellPrefix: string = "portfolio-overview-table-body-cell";
 const cellContainerPrefix: string = "portfolio-overview-table-cell-container-";

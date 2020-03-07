@@ -1,6 +1,6 @@
 import { browser } from "webextension-polyfill-ts";
-import { PortfolioListViewSnapshot } from "./Portfolio";
-import { AccountSnapshot } from "./EtAccountBalanceFooter";
+import { PortfolioListViewSnapshot } from "./portfolio";
+import { AccountSnapshot } from "./footer";
 
 function snapshotKey(date: Date): number {
     return date.getTime();

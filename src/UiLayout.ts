@@ -1,8 +1,8 @@
-import { Portfolio } from "./Portfolio";
+import { Portfolio } from "./portfolio";
 import { SyncEvent } from "ts-events";
 import { filter } from "./Utils";
-import { Header } from "./Header";
-import { EtAccountBalanceFooter } from "./EtAccountBalanceFooter";
+import { Header } from "./header";
+import { EtAccountBalanceFooter } from "./footer";
 
 export class UiLayout {
     public static readonly selector: string = "ui-layout";

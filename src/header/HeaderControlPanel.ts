@@ -1,4 +1,4 @@
-import styles from "./main.scss";
+import styles from "../main.scss";
 import { SyncEvent } from "ts-events";
 
 export class HeaderControlPanel {

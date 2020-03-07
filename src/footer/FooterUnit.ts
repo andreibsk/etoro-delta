@@ -1,5 +1,5 @@
-import { Delta } from "./Delta";
-import styles from "./main.scss";
+import { Delta } from "../Delta";
+import styles from "../main.scss";
 import { SyncEvent } from "ts-events";
 
 const unitPrefix: string = "account-balance";

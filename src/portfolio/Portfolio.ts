@@ -1,5 +1,5 @@
 import { PortfolioListRow, PortfolioListRowSnapshot } from "./PortfolioListRow";
-import { filter } from "./Utils";
+import { filter } from "../Utils";
 
 const selector = {
     element: "portfolio-list-view[view-state-mode='LIST']",
