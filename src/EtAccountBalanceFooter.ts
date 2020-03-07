@@ -12,6 +12,7 @@ export class EtAccountBalanceFooter {
     public static readonly selector: string = "et-account-balance";
 
     public readonly element: Element;
+    private readonly amountUnit: FooterUnit;
     private readonly units: FooterUnits;
 
     constructor(element: Element) {
@@ -19,10 +20,12 @@ export class EtAccountBalanceFooter {
             throw new Error("Element doesn't match a Footer.");
 
         this.element = element;
+        this.amountUnit = new FooterUnit(element, "amount-unit");
         this.units = {
-            profit: new FooterUnit(element, "profit-unit"),
+            profit: new FooterUnit(element, "profit-unit", true, true, this.amountUnit.value),
             total: new FooterUnit(element, "amount-total", true)
         };
+        this.amountUnit.valueChanged.attach(value => this.units.profit.compareValueTotal = value);
     }
 
     public set compareSnapshot(snapshot: AccountSnapshot | null) {

@@ -1,4 +1,6 @@
 import { Delta } from "./Delta";
+import styles from "./main.scss";
+import { SyncEvent } from "ts-events";
 
 const unitPrefix: string = "account-balance";
 const eIdAttributeName = "automation-id";
@@ -15,13 +17,19 @@ export type FooterUnitSnapshot = number;
 export class FooterUnit {
     private readonly element: Element;
     private readonly valueElement: Element;
+    private readonly valuePercentElement: Element | null;
 
     private delta: Delta | null;
     private _compareValue: number | null = null;
-    private readonly displayPercent: boolean;
-    private readonly compareObserver: MutationObserver;
+    private _compareValueTotal: number | null = null;
+    private readonly displayDeltaPercent: boolean;
+    private readonly valueObserver: MutationObserver;
 
-    constructor(parentElement: Element, name: string, displayPercent?: boolean) {
+    public readonly valueChanged = new SyncEvent<number>();
+
+    constructor(parentElement: Element, name: string, displayDeltaPercent?: boolean, displayValuePercent?: boolean,
+        compareValueTotal?: number) {
+
         const element = parentElement.querySelector(selector.element + selector.unit(name));
         const valueElement = element?.querySelector(selector.valueElement);
 
@@ -30,8 +38,20 @@ export class FooterUnit {
 
         this.element = element;
         this.valueElement = valueElement;
-        this.displayPercent = displayPercent ?? false;
-        this.compareObserver = new MutationObserver((m, o) => this.onDeltaChanged(m, o));
+        this.displayDeltaPercent = displayDeltaPercent ?? false;
+        this.valueObserver = new MutationObserver(() => this.onValueMutationObserved());
+        this.valueObserver.observe(this.valueElement, { characterData: true, subtree: true });
+
+        if (displayValuePercent) {
+            const elem = document.createElement("span");
+            elem.className = styles.footerUnitValuePercent;
+
+            this.valueElement.appendChild(elem);
+            this.valuePercentElement = elem;
+
+            if (compareValueTotal)
+                this.compareValueTotal = compareValueTotal;
+        }
     }
 
     private get compareValue(): number | null {
@@ -39,19 +59,15 @@ export class FooterUnit {
     }
 
     private set compareValue(value: number | null) {
-        this.compareObserver.disconnect();
         this._compareValue = value;
 
         if (value != null) {
-            this.compareObserver.observe(this.valueElement, { characterData: true, subtree: true });
             if (this.delta == null) {
                 this.delta = new Delta();
                 this.element.insertBefore(this.delta.element, this.valueElement.nextSibling);
             }
 
-            this.delta.value = this.compareValue == null ? 0 : this.value - this._compareValue!;
-            if (this.displayPercent)
-                this.delta.percentValue = (this.value - this._compareValue!) * 100 / this._compareValue!;
+            this.updateDeltaValues();
         }
         else {
             if (this.delta != null) {
@@ -61,20 +77,13 @@ export class FooterUnit {
         }
     }
 
+    public set compareValueTotal(value: number | null) {
+        this._compareValueTotal = value;
+        this.updateDeltaValues();
+    }
+
     public get value(): number {
-        return parseFloat(this.valueString.replace(/[$%<>,]/g, ""));
-    }
-
-    public get valueString(): string {
-        return this.valueElement.textContent!.trim();
-    }
-
-    private onDeltaChanged(_m: MutationRecord[], _o: MutationObserver) {
-        if (this.delta != null) {
-            this.delta.value = this.compareValue == null ? 0 : this.value - this._compareValue!;
-            if (this.displayPercent)
-                this.delta.percentValue = (this.value - this._compareValue!) * 100 / this._compareValue!;
-        }
+        return parseFloat(this.valueElement.childNodes[0].nodeValue!.trim().replace(/[$%<>,]/g, ""));
     }
 
     public set compareSnapshot(snapshot: FooterUnitSnapshot | null) {
@@ -83,5 +92,27 @@ export class FooterUnit {
 
     public createSnapshot(): FooterUnitSnapshot {
         return this.value;
+    }
+
+    private onValueMutationObserved() {
+        this.updateDeltaValues();
+        this.valueChanged.post(this.value);
+    }
+
+    private updateDeltaValues() {
+        if (this.delta != null) {
+            const deltaValue = this.compareValue == null ? 0 : this.value - this._compareValue!;
+            this.delta.value = deltaValue;
+
+            if (this.displayDeltaPercent)
+                this.delta.percentValue = this._compareValueTotal
+                    ? deltaValue * 100 / this._compareValueTotal
+                    : (this.value - this._compareValue!) * 100 / this._compareValue!;
+        }
+
+        if (this.valuePercentElement && this._compareValueTotal) {
+            const valuePercent = this.value * 100 / this._compareValueTotal;
+            this.valuePercentElement.textContent = valuePercent ? ` (${valuePercent.toFixed(2)}%)` : "";
+        }
     }
 }
