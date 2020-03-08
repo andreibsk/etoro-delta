@@ -1,4 +1,4 @@
-import { HeaderControlPanel } from "./HeaderControlPanel";
+import { ControlMenu } from "./ControlMenu";
 
 const selector = {
     header: "header.a-header",
@@ -9,15 +9,15 @@ export class Header {
     public static readonly selector: string = selector.header;
 
     public readonly element: Element;
-    public readonly controlPanel: HeaderControlPanel;
+    public readonly controlMenu: ControlMenu;
 
     constructor(element: Element) {
         if (!element.matches(selector.header))
             throw new Error("Element doesn't match a Header.");
 
-        this.controlPanel = new HeaderControlPanel();
+        this.controlMenu = new ControlMenu();
         element
             .querySelector(selector.toolbox)!
-            .prepend(this.controlPanel.element);
+            .prepend(this.controlMenu.buttonElement);
     }
 }

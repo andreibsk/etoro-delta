@@ -29,10 +29,10 @@ uiLayout.headerAdded.attach(async (h: Header) => {
 
 	const selectedSnapshotDate = await storage.getSelectedSnapshotDate();
 
-	header.controlPanel.snapshotDates = await storage.getSnapshotDates();
-	header.controlPanel.selectedSnapshotDate = selectedSnapshotDate;
-	header.controlPanel.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest());
-	header.controlPanel.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(d));
+	header.controlMenu.snapshotDates = await storage.getSnapshotDates();
+	header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
+	header.controlMenu.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest());
+	header.controlMenu.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(d));
 	
 	await onSelectedSnapshotDateChange(selectedSnapshotDate, false);
 });
@@ -63,7 +63,7 @@ async function onCreateSnapshotRequest() {
 		portfolio: portfolio.createSnapshot()
 	};
 	const snapshotDate = await storage.addSnapshot(snapshot);
-	header.controlPanel.addSnapshotDate(snapshotDate);
+	header.controlMenu.addSnapshotDate(snapshotDate);
 	console.debug(`Snapshot saved (${snapshotDate.toLocaleString()}):`, snapshot);
 }
 

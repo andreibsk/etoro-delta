@@ -54,3 +54,99 @@
         justify-content: center;
     }
 }
+
+.control-menu-button {
+    display: inline-block;
+
+    &:hover {
+        background-color: #4E515A;
+    }
+
+    &.control-menu-button-open {
+        background-color: #FFFFFF;
+    }
+}
+
+.control-menu-logo {
+    background-size: contain;
+    margin-right: 0 !important;
+
+    .control-menu-button-open > & {
+        filter: brightness(0.8);
+    }
+}
+
+.control-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 362px;
+    max-height: 410px;
+    background-color: #FFFFFF;
+    box-shadow: 1px 2px 4px -1px rgba(0,0,0,.3);
+
+    &:not(.control-menu-open) {
+        display: none;
+    }
+
+    .control-menu-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        border-bottom: 1px solid #ededed;
+        color: #777777;
+        padding: 10px 12px;
+
+        .control-menu-header-button {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .create-icon::before {
+            content: "\e952";
+            font-family: iconFont;
+            font-style: normal;
+            margin-right: 6px;
+        }
+
+        .cancel-icon::before {
+            content: "\e919";
+            font-family: iconFont;
+            font-style: normal;
+            margin-right: 6px;
+        }
+    }
+}
+
+.snapshot-list {
+    flex: 1 1 auto;
+    overflow: auto;
+    background-color: #f9f9f9;
+}
+
+.snapshot-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    padding: 15px;
+    border-bottom: 1px solid #ededed;
+    cursor: pointer;
+
+    &.snapshot-item-selected {
+        font-weight: 600;
+        background-color: #fff;
+        box-shadow: 1px 1px 3px 0 rgba(44,44,44,.3);
+        cursor: default;
+        
+         &::after {
+            content: "\e944";
+            font-family: iconFont;
+            font-style: normal;
+            text-align: center;
+            color: #6bad10;
+            font-size: 16px;
+        }
+    }
+}
