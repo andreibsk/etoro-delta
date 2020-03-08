@@ -131,53 +131,64 @@
 }
 
 .snapshot-list {
+    display: flex;
+    flex-direction: column;
     flex: 1 1 auto;
     overflow: auto;
     background-color: #f9f9f9;
-}
+    text-align: center;
 
-.snapshot-item {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: nowrap;
-    padding: 15px;
-    border-bottom: 1px solid #ededed;
-    cursor: pointer;
-
-    &.snapshot-item-selected {
-        font-weight: 600;
-        background-color: #fff;
-        box-shadow: 1px 1px 3px 0 rgba(44,44,44,.3);
-        cursor: default;
-        
-         &::after {
-            content: "\e944";
-            font-family: iconFont;
-            font-style: normal;
-            text-align: center;
-            color: #6bad10;
-            font-size: 16px;
-        }
+    &:empty::before {
+        content: "No snapshots found ¯\\_(ツ)_/¯ \A Create one above.";
+        white-space: pre-wrap;
+        padding: 10px;
+        color: #777777;
+        font-size: small;
     }
 
-    .snapshot-item-delete-button {
-        display: none;
+    .snapshot-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        padding: 10px 12px;
+        border-bottom: 1px solid #ededed;
+        cursor: pointer;
 
-        &::before {
-            content: "\e919";
-            font-family: iconFont;
-            color: #777777;
+        &.snapshot-item-selected {
+            font-weight: 600;
+            background-color: #fff;
+            box-shadow: 1px 1px 3px 0 rgba(44,44,44,.3);
+            cursor: default;
+            
+            &::after {
+                content: "\e944";
+                font-family: iconFont;
+                font-style: normal;
+                text-align: center;
+                color: #6bad10;
+                font-size: 16px;
+            }
         }
-        &:hover::before {
-            color: #CE1D1D;
-        }
-        &:active::before {
-            font-weight: bold;
-        }
-    }
 
-    &:hover:not(.snapshot-item-selected) .snapshot-item-delete-button {
-        display: inline-flex;
+        .snapshot-item-delete-button {
+            display: none;
+
+            &::before {
+                content: "\e919";
+                font-family: iconFont;
+                color: #777777;
+            }
+            &:hover::before {
+                color: #CE1D1D;
+            }
+            &:active::before {
+                font-weight: bold;
+            }
+        }
+
+        &:hover:not(.snapshot-item-selected) .snapshot-item-delete-button {
+            display: inline-flex;
+        }
     }
 }
