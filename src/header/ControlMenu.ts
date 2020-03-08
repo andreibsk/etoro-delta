@@ -15,6 +15,7 @@ export class ControlMenu {
     public readonly createSnapshotButton: HTMLElement;
     public readonly onCreateSnapshotRequest = new SyncEvent<void>();
     public readonly onSelectedSnapshotDateChange = new SyncEvent<Date | null>();
+    public onDeleteSnapshot: ((date: Date) => Promise<boolean>) | null = null;
 
     constructor() {
         document.body.onclick = e => this.onBodyClick(e);
@@ -60,11 +61,18 @@ export class ControlMenu {
 
     public set snapshotDates(dates: Date[]) {
         this.snapshotList.clear();
-        this.snapshotList.add(...dates.map(d => new SnapshotItem(d, i => this.onSnapshotItemClick(i))));
+        this.snapshotList.add(...dates.map(d => this.newSnapshotItem(d)));
     }
 
 	public addSnapshotDate(date: Date) {
-        this.snapshotList.add(new SnapshotItem(date, i => this.onSnapshotItemClick(i)));
+        this.snapshotList.add(this.newSnapshotItem(date));
+    }
+
+    private newSnapshotItem(date: Date): SnapshotItem {
+        return new SnapshotItem(
+            date,
+            i => this.onSnapshotItemClick(i),
+            i => this.onSnapshotItemDeleteClick(i));
     }
     
     private onBodyClick(e: MouseEvent) {
@@ -77,6 +85,11 @@ export class ControlMenu {
         
         if (oldItem != (this.snapshotList.selectedItem = item))
             this.onSelectedSnapshotDateChange.post(item.date);
+    }
+
+    private async onSnapshotItemDeleteClick(item: SnapshotItem) {
+        if (this.onDeleteSnapshot && await this.onDeleteSnapshot(item.date))
+            this.snapshotList.remove(item);
     }
 
     private toggleMenuOpen(forceOpen?: boolean) {

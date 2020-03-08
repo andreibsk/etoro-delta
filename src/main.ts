@@ -52,8 +52,9 @@ function initializeUiLayout(elem: Element) {
 
 		header.controlMenu.snapshotDates = await storage.getSnapshotDates();
 		header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
-		header.controlMenu.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest());
-		header.controlMenu.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(d));
+		header.controlMenu.onCreateSnapshotRequest.attach(onCreateSnapshotRequest);
+		header.controlMenu.onSelectedSnapshotDateChange.attach(onSelectedSnapshotDateChange);
+		header.controlMenu.onDeleteSnapshot = onDeleteSnapshot;
 
 		await onSelectedSnapshotDateChange(selectedSnapshotDate, false);
 	});
@@ -87,6 +88,11 @@ async function onCreateSnapshotRequest() {
 	const snapshotDate = await storage.addSnapshot(snapshot);
 	header.controlMenu.addSnapshotDate(snapshotDate);
 	console.debug(`Snapshot saved (${snapshotDate.toLocaleString()}):`, snapshot);
+}
+
+async function onDeleteSnapshot(date: Date): Promise<boolean> {
+	console.debug("Delete snapshot:", date);
+	return await storage.removeSnapshot(date);
 }
 
 async function onSelectedSnapshotDateChange(date: Date | null, save: boolean = true) {

@@ -51,4 +51,16 @@ export class SnapshotList {
     public get(date: Date): SnapshotItem | null {
         return this.items[date.getTime()] ?? null;
     }
+
+    public remove(item: SnapshotItem) {
+        const time = item.date.getTime();
+        if (this.items[time] != item)
+            throw new Error("Cannot remove SnapshotItem because it's not part of the list.");
+
+        if (this._selectedItem == item)
+            throw new Error("Cannot remove the selected SnapshotItem.");
+
+        item.element.remove();
+        delete this.items[time];
+    }
 }

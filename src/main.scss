@@ -160,4 +160,24 @@
             font-size: 16px;
         }
     }
+
+    .snapshot-item-delete-button {
+        display: none;
+
+        &::before {
+            content: "\e919";
+            font-family: iconFont;
+            color: #777777;
+        }
+        &:hover::before {
+            color: #CE1D1D;
+        }
+        &:active::before {
+            font-weight: bold;
+        }
+    }
+
+    &:hover:not(.snapshot-item-selected) .snapshot-item-delete-button {
+        display: inline-flex;
+    }
 }

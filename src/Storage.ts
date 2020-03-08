@@ -2,10 +2,6 @@ import { browser } from "webextension-polyfill-ts";
 import { PortfolioListViewSnapshot } from "./portfolio";
 import { AccountSnapshot } from "./footer";
 
-function snapshotKey(date: Date): number {
-    return date.getTime();
-}
-
 export type Snapshot = {
     account: AccountSnapshot,
     portfolio: PortfolioListViewSnapshot
@@ -41,6 +37,15 @@ class SyncStorage {
         return date;
     }
 
+    public async removeSnapshot(date: Date): Promise<boolean> {
+        const time = date.getTime();
+        const snapshotTimes = await this.getSnapshotDateTimes();
+        const removedTimes = snapshotTimes.splice(snapshotTimes.indexOf(time), 1);
+
+        await set("snapshots", snapshotTimes);
+        return await remove(...removedTimes);
+    }
+
     public async setSelectedSnapshotDate(date: Date | null) {
         await set("selectedSnapshot", date ? date.getTime() : null);
     }
@@ -58,18 +63,45 @@ class SyncStorage {
 export const storage = new SyncStorage();
 
 async function get<T>(key: keyof StorageModel): Promise<T | undefined> {
-    const storage = await browser.storage.sync.get(key.toString());
+    const storage = await browser.storage.sync.get(normalizeKey(key));
+    if (browser.runtime.lastError) {
+        console.error("Failed to get object from storage:", browser.runtime.lastError?.message);
+    }
+
     return storage[key];
+}
+
+function normalizeKey(key: keyof StorageModel): string {
+    return typeof key === "number" ? key.toString() : key;
+}
+
+async function remove(...keys: (keyof StorageModel)[]): Promise<boolean> {
+    await browser.storage.sync.remove(keys.map(normalizeKey));
+
+    if (browser.runtime.lastError) {
+        console.error("Failed to remove object(s) from storage:", browser.runtime.lastError?.message);
+        return false;
+    }
+
+    return true;
 }
 
 async function set<T1, T2>(key: keyof StorageModel, value: T1): Promise<void>;
 async function set<T1, T2>(k1: keyof StorageModel, v1: T1, k2: keyof StorageModel, v2: T2): Promise<void>;
 async function set<T1, T2>(k1: keyof StorageModel, v1: T1, k2?: keyof StorageModel, v2?: T2): Promise<void> {
     const items: any = {};
-    items[k1] = v1;
+    items[normalizeKey(k1)] = v1;
 
-    if (k2 && v2)
-        items[k2] = v2;
-
+    if (k2 && v2) {
+        items[normalizeKey(k2)] = v2;
+    }
     await browser.storage.sync.set(items);
+
+    if (browser.runtime.lastError) {
+        console.error("Failed to save object(s) to storage:", browser.runtime.lastError?.message);
+    }
+}
+
+function snapshotKey(date: Date): number {
+    return date.getTime();
 }
