@@ -1,4 +1,5 @@
 import styles from "../main.scss";
+import moment from "moment";
 
 export class SnapshotItem {
     public readonly element: HTMLLIElement;
@@ -8,8 +9,10 @@ export class SnapshotItem {
         this.date = date;
         this.element = document.createElement("li");
         this.element.className = styles.snapshotItem;
-        this.element.textContent = date.toLocaleString();
+        this.element.title = date.toLocaleString();
         this.element.onclick = () => onclick(this);
+        this.updateTextContent();
+        setInterval(() => this.updateTextContent(), 60 * 1000);
 
         const deleteButton = document.createElement("div");
         deleteButton.className = styles.snapshotItemDeleteButton;
@@ -20,5 +23,9 @@ export class SnapshotItem {
 
     public set selected(value: boolean) {
         this.element.classList.toggle(styles.snapshotItemSelected, value);
+    }
+
+    public updateTextContent() {
+        this.element.textContent = `${this.date.toLocaleString()} (${moment(this.date).fromNow()})`;
     }
 }

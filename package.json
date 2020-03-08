@@ -31,6 +31,7 @@
     "webpack-shell-plugin-next": "^1.1.5"
   },
   "dependencies": {
+    "moment": "^2.24.0",
     "ts-events": "^3.4.0"
   }
 }
