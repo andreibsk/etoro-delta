@@ -62,6 +62,17 @@
         background-color: #4E515A;
     }
 
+    &::before {
+        // Initiates loading of font weight 600;
+        content: "a";
+        font-weight: 600;
+        user-select: none;
+        color: transparent;
+        width: 0;
+        height: 0;
+        position: absolute;
+    }
+
     &.control-menu-button-open {
         background-color: #FFFFFF;
     }
