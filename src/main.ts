@@ -3,53 +3,75 @@ import { Portfolio } from "./portfolio";
 import { storage, Snapshot } from "./Storage";
 import { Header } from "./header";
 import { EtAccountBalanceFooter } from "./footer";
+import { filter } from "./Utils";
 
 console.log('eToro Delta loaded.');
 
-const uiLayout = new UiLayout(document.querySelector(UiLayout.selector)!);
+let uiLayout: UiLayout;
 let header: Header;
 let accountFooter: EtAccountBalanceFooter | null = null;
 let portfolio: Portfolio | null = null;
 let selectedSnapshot: Snapshot | null = null;
 
-uiLayout.portfolioAdded.attach(async (p: Portfolio) => {
-	console.debug("Portfolio added.");
-	console.assert(header, "Portfolio mounted before the header.");
-	portfolio = p;
-	portfolio.compareSnapshot = selectedSnapshot === null ? null : selectedSnapshot.portfolio;
-});
-uiLayout.portfolioRemoved.attach(() => {
-	console.debug("Portfolio removed.");
-	portfolio = null;
-});
+const uiLayoutElement = document.querySelector(UiLayout.selector);
+if (uiLayoutElement) {
+	initializeUiLayout(uiLayoutElement);
+}
+else {
+	const uiLayoutObserver = new MutationObserver((mutations: MutationRecord[], observer: MutationObserver) => {
+		const mutationResult = filter(mutations, UiLayout.selector).next();
+		if (!mutationResult.value || mutationResult.value.added != true)
+			return;
+		
+		console.debug("UiLayout added.");
+		observer.disconnect();
+		initializeUiLayout(mutationResult.value.element);
+	});
+	uiLayoutObserver.observe(document.body, { childList: true, subtree: true });
+}
 
-uiLayout.headerAdded.attach(async (h: Header) => {
-	console.debug("Header added.");
-	header = h;
+function initializeUiLayout(elem: Element) {
+	uiLayout = new UiLayout(elem);
 
-	const selectedSnapshotDate = await storage.getSelectedSnapshotDate();
+	uiLayout.portfolioAdded.attach(async (p: Portfolio) => {
+		console.debug("Portfolio added.");
+		console.assert(header, "Portfolio mounted before the header.");
+		portfolio = p;
+		portfolio.compareSnapshot = selectedSnapshot === null ? null : selectedSnapshot.portfolio;
+	});
+	uiLayout.portfolioRemoved.attach(() => {
+		console.debug("Portfolio removed.");
+		portfolio = null;
+	});
 
-	header.controlMenu.snapshotDates = await storage.getSnapshotDates();
-	header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
-	header.controlMenu.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest());
-	header.controlMenu.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(d));
-	
-	await onSelectedSnapshotDateChange(selectedSnapshotDate, false);
-});
-uiLayout.headerRemoved.attach(() => { 
-	console.debug("Header removed.")
-});
+	uiLayout.headerAdded.attach(async (h: Header) => {
+		console.debug("Header added.");
+		header = h;
 
-uiLayout.footerAdded.attach(async (f: EtAccountBalanceFooter) => {
-	console.debug("Footer added.");
-	console.assert(header, "Footer mounted before the header.");
-	accountFooter = f;
-	accountFooter.compareSnapshot = selectedSnapshot === null ? null : selectedSnapshot.account;
-});
-uiLayout.footerRemoved.attach(() => {
-	console.debug("Footer removed.");
-	accountFooter = null;
-});
+		const selectedSnapshotDate = await storage.getSelectedSnapshotDate();
+
+		header.controlMenu.snapshotDates = await storage.getSnapshotDates();
+		header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
+		header.controlMenu.onCreateSnapshotRequest.attach(() => onCreateSnapshotRequest());
+		header.controlMenu.onSelectedSnapshotDateChange.attach(d => onSelectedSnapshotDateChange(d));
+
+		await onSelectedSnapshotDateChange(selectedSnapshotDate, false);
+	});
+	uiLayout.headerRemoved.attach(() => {
+		console.debug("Header removed.")
+	});
+
+	uiLayout.footerAdded.attach(async (f: EtAccountBalanceFooter) => {
+		console.debug("Footer added.");
+		console.assert(header, "Footer mounted before the header.");
+		accountFooter = f;
+		accountFooter.compareSnapshot = selectedSnapshot === null ? null : selectedSnapshot.account;
+	});
+	uiLayout.footerRemoved.attach(() => {
+		console.debug("Footer removed.");
+		accountFooter = null;
+	});
+}
 
 async function onCreateSnapshotRequest() {
 	console.debug("Create snapshot requested.");
@@ -78,7 +100,7 @@ async function onSelectedSnapshotDateChange(date: Date | null, save: boolean = t
 
 	if (portfolio)
 		portfolio.compareSnapshot = snapshot === null ? null : snapshot.portfolio;
-	
+
 	if (accountFooter)
 		accountFooter.compareSnapshot = snapshot === null ? null : snapshot.account;
 

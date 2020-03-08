@@ -1,5 +1,10 @@
+type FilteredMutation = {
+    element: Element;
+    added: boolean;
+};
+
 export function* filter(records: MutationRecord[], ...selectors: string[])
-    : Generator<{ element: Element, added: boolean }> {
+    : Generator<FilteredMutation, void> {
 
     const selector = selectors.join(", ");
 
