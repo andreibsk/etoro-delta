@@ -3,14 +3,19 @@ import moment from "moment";
 
 export class SnapshotItem {
     public readonly element: HTMLLIElement;
+    public readonly dateElement: HTMLElement;
     public readonly date: Date;
 
     constructor(date: Date, onclick: (i: SnapshotItem) => void, ondelete: (i: SnapshotItem) => void) {
         this.date = date;
         this.element = document.createElement("li");
         this.element.className = styles.snapshotItem;
-        this.element.title = date.toLocaleString();
-        this.element.onclick = () => onclick(this);
+
+        this.dateElement = document.createElement("div");
+        this.dateElement.className = styles.snapshotItemDate;
+        this.dateElement.title = date.toLocaleString();
+        this.dateElement.onclick = () => onclick(this);
+        this.element.appendChild(this.dateElement);
         this.updateTextContent();
         setInterval(() => this.updateTextContent(), 60 * 1000);
 
@@ -26,6 +31,6 @@ export class SnapshotItem {
     }
 
     public updateTextContent() {
-        this.element.textContent = `${this.date.toLocaleString()} (${moment(this.date).fromNow()})`;
+        this.dateElement.textContent = `${moment(this.date).calendar()} (${moment(this.date).fromNow()})`;
     }
 }
