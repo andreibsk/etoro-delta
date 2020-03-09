@@ -32,6 +32,7 @@ export class ControlMenu {
 
         this.menuElement = document.createElement("div");
         this.menuElement.className = styles.controlMenu;
+        this.menuElement.onclick = e => e.stopPropagation();
         this.buttonElement.appendChild(this.menuElement);
 
         const menuHeaderElement = document.createElement("header");
@@ -39,15 +40,16 @@ export class ControlMenu {
         this.menuElement.appendChild(menuHeaderElement);
 
         this.createSnapshotButton = document.createElement("div");
-        this.createSnapshotButton.textContent = "Create snapshot"
+        this.createSnapshotButton.textContent = "Create"
         this.createSnapshotButton.classList.add(styles.controlMenuHeaderButton, styles.createIcon);
         this.createSnapshotButton.onclick = () => this.onCreateSnapshotRequest.post();
         menuHeaderElement.appendChild(this.createSnapshotButton);
 
         this.cancelCompareButton = document.createElement("div");
-        this.cancelCompareButton.textContent = "Cancel compare";
+        this.cancelCompareButton.textContent = "Cancel";
         this.cancelCompareButton.classList.add(styles.controlMenuHeaderButton, styles.cancelIcon);
         this.cancelCompareButton.onclick = () => this.selectedSnapshotDate = null;
+        this.cancelCompareButtonShown = false;
         menuHeaderElement.appendChild(this.cancelCompareButton);
 
         this.snapshotList = new SnapshotList();
@@ -56,12 +58,18 @@ export class ControlMenu {
 
     public set selectedSnapshotDate(date: Date | null) {
         this.snapshotList.selectedItem = date ? this.snapshotList.get(date) : null;
+        this.cancelCompareButtonShown = !!date;
         this.onSelectedSnapshotDateChange.post(this.snapshotList.selectedItem?.date ?? null);
     }
 
     public set snapshotDates(dates: Date[]) {
         this.snapshotList.clear();
+        this.cancelCompareButtonShown = false;
         this.snapshotList.add(...dates.map(d => this.newSnapshotItem(d)));
+    }
+
+    private set cancelCompareButtonShown(shown: boolean) {
+        this.cancelCompareButton.style.display = shown ? "" : "none";
     }
 
 	public addSnapshotDate(date: Date) {
@@ -83,8 +91,10 @@ export class ControlMenu {
     private onSnapshotItemClick(item: SnapshotItem) {
         const oldItem = this.snapshotList.selectedItem;
         
-        if (oldItem != (this.snapshotList.selectedItem = item))
+        if (oldItem != (this.snapshotList.selectedItem = item)) {
+            this.cancelCompareButtonShown = true;
             this.onSelectedSnapshotDateChange.post(item.date);
+        }
     }
 
     private async onSnapshotItemDeleteClick(item: SnapshotItem) {
