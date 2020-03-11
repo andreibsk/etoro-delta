@@ -3,18 +3,24 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import WebpackShellPluginNext from 'webpack-shell-plugin-next';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import { ConfigurationFactory, WatchIgnorePlugin } from 'webpack';
 const ExtensionReloader = require('webpack-extension-reloader');
 
 const config: ConfigurationFactory = (_env, argv) => {
     const devMode = argv.mode === 'development';
+    const watchMode = (<any>argv).watch === true;
     const devtool = devMode ? 'inline-source-map' : false;
 
     console.log("Development mode:", devMode);
+    console.log("Watch mode:", watchMode);
     console.log("devtool:", devtool);
 
     return {
         devtool,
+        stats: {
+            children: false
+        },
         entry:
         {
             main: "./src/main.ts",
@@ -62,6 +68,7 @@ const config: ConfigurationFactory = (_env, argv) => {
             ],
         },
         plugins: [
+            new CleanWebpackPlugin(),
             new CopyWebpackPlugin([
                 'src/manifest.json',
                 { from: 'src/images/*.png', to: 'images/[name].[ext]' }
@@ -69,7 +76,7 @@ const config: ConfigurationFactory = (_env, argv) => {
             new MiniCssExtractPlugin(),
             new ForkTsCheckerWebpackPlugin({ async: false }),
             new WatchIgnorePlugin([/scss\.d\.ts$/]),
-            ...(devMode
+            ...(watchMode
                 ? [
                     new ExtensionReloader({ manifest: path.resolve(__dirname, "src", "manifest.json") }),
                     new WebpackShellPluginNext({

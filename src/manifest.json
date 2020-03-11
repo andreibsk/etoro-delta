@@ -2,12 +2,6 @@
   "name": "eToro Delta",
   "version": "1.0",
   "description": "Display changes in eToro portfolio page",
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{13c4c539-ca78-41ce-a953-df623fb34435}",
-      "strict_min_version": "53.0"
-    }
-  },
   "permissions": [
     "storage"
   ],
