@@ -22,6 +22,7 @@ export class Delta {
     }
 
     public set value(value: number) {
+        const valueDelta = value - this._value;
         this._value = value;
 
         this.element.childNodes[1].textContent = Delta.displayString(this._value, this._percentValue);
@@ -32,7 +33,6 @@ export class Delta {
             this.element.classList.add(valueClass);
         }
 
-        const valueDelta = this._value - this._value;
         this.arrowElement.className = "";
         void this.arrowElement.offsetWidth;
         this.arrowElement.className = styles[valueDelta > 0 ? "arrowSignPositive" : "arrowSignNegative"];
