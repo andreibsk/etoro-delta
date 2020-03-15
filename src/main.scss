@@ -42,6 +42,9 @@
     }
 }
 
+$control-menu-item-border: 1px solid #ededed;
+$control-menu-item-color: #777777;
+
 .control-menu-container {
     display: inline-flex;
     flex-direction: column;
@@ -105,8 +108,8 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-            border-bottom: 1px solid #ededed;
-            color: #777777;
+            border-bottom: $control-menu-item-border;
+            color: $control-menu-item-color;
             padding: 10px 12px;
 
             .control-menu-header-button {
@@ -136,6 +139,13 @@
                 margin-right: 6px;
             }
         }
+
+        .control-menu-footer {
+            font-size: x-small;
+            color: $control-menu-item-color;
+            padding: 0 12px;
+            border-top: $control-menu-item-border;
+        }
     }
 }
 
@@ -151,7 +161,7 @@
         content: "No snapshots found ¯\\_(ツ)_/¯ \A Create one above.";
         white-space: pre-wrap;
         padding: 10px;
-        color: #777777;
+        color: $control-menu-item-color;
         font-size: small;
     }
 
@@ -161,7 +171,10 @@
         align-items: center;
         flex-wrap: nowrap;
         padding: 10px 12px;
-        border-bottom: 1px solid #ededed;
+
+        &:not(:last-child) {
+            border-bottom: $control-menu-item-border;
+        }
 
         &.snapshot-item-selected {
             font-weight: 600;
@@ -194,7 +207,7 @@
             &::before {
                 content: "\e92f";
                 font-family: iconFont;
-                color: #777777;
+                color: $control-menu-item-color;
             }
             &:hover::before {
                 color: #CE1D1D;

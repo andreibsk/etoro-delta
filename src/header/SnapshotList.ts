@@ -42,6 +42,9 @@ export class SnapshotList {
     }
 
     public clear() {
+        if (this.selectedItem)
+            this.selectedItem = null;
+
         for (const time in this.items) {
             this.items[time].element.remove();
             delete this.items[time];
