@@ -68,7 +68,7 @@ const config: ConfigurationFactory = (_env, argv) => {
             ],
         },
         plugins: [
-            new CleanWebpackPlugin(),
+            ...(watchMode ? [] : [new CleanWebpackPlugin()]),
             new CopyWebpackPlugin([
                 'src/manifest.json',
                 { from: 'src/images/*.png', to: 'images/[name].[ext]' }
@@ -81,7 +81,7 @@ const config: ConfigurationFactory = (_env, argv) => {
                     new ExtensionReloader({ manifest: path.resolve(__dirname, "src", "manifest.json") }),
                     new WebpackShellPluginNext({
                         onBuildEnd: {
-                            scripts: [ 'npx tsm -e default --watch --ignoreInitial src' ],
+                            scripts: ['npx tsm -e default --watch --ignoreInitial src'],
                             parallel: true
                         }
                     })]
