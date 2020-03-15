@@ -1,3 +1,23 @@
+import moment, { CalendarSpec } from "moment";
+
+export const pastOnlyShortCalendarFormat: CalendarSpec = {
+    lastDay : '[Yesterday] LT',
+    sameDay : 'LT',
+    nextDay : '',
+    lastWeek : 'dddd LT',
+    nextWeek : '',
+    sameElse : 'L LT'
+};
+export const pastOnlyCalendarFormat: CalendarSpec = {
+    lastDay : '[Yesterday at] LT',
+    sameDay : '[Today at] LT',
+    nextDay : '',
+    lastWeek : 'dddd [at] LT',
+    nextWeek : '',
+    sameElse : 'L LT'
+};
+moment.updateLocale("en", { calendar: pastOnlyCalendarFormat });
+
 type FilteredMutation = {
     element: Element;
     added: boolean;

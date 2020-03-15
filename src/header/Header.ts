@@ -18,6 +18,6 @@ export class Header {
         this.controlMenu = new ControlMenu();
         element
             .querySelector(selector.toolbox)!
-            .prepend(this.controlMenu.buttonElement);
+            .prepend(this.controlMenu.menuContainerElement);
     }
 }

@@ -3,16 +3,19 @@ import { browser } from "webextension-polyfill-ts";
 import { SnapshotList } from "./SnapshotList";
 import { SnapshotItem } from "./SnapshotItem";
 import { SyncEvent } from "ts-events";
+import moment from "moment";
+import { pastOnlyShortCalendarFormat } from "../Utils";
 
 export class ControlMenu {
-    private readonly menuElement: HTMLElement;
     private open: boolean = false;
+    private readonly menuElement: HTMLElement;
+    private readonly buttonElement: HTMLElement;
+    private readonly buttonDateElement: HTMLElement;
+    private readonly snapshotList: SnapshotList;
+    private readonly cancelCompareButton: HTMLElement;
 
-    public readonly buttonElement: HTMLElement;
-    public readonly buttonLogoElement: HTMLElement;
-    public readonly snapshotList: SnapshotList;
-    public readonly cancelCompareButton: HTMLElement;
-    public readonly createSnapshotButton: HTMLElement;
+    public readonly menuContainerElement: HTMLElement;
+
     public readonly onCreateSnapshotRequest = new SyncEvent<void>();
     public readonly onSelectedSnapshotDateChange = new SyncEvent<Date | null>();
     public onDeleteSnapshot: ((date: Date) => Promise<boolean>) | null = null;
@@ -20,30 +23,40 @@ export class ControlMenu {
     constructor() {
         document.body.onclick = e => this.onBodyClick(e);
 
+        this.menuContainerElement = document.createElement("div");
+        this.menuContainerElement.className = styles.controlMenuContainer;
+
         this.buttonElement = document.createElement("div");
         this.buttonElement.classList.add(styles.controlMenuButton);
-        this.buttonElement.onclick = e => this.toggleMenuOpen();
+        this.buttonElement.onclick = () => this.toggleMenuOpen();
+        this.menuContainerElement.appendChild(this.buttonElement);
 
-        this.buttonLogoElement = document.createElement("div");
-        this.buttonLogoElement.classList.add(styles.controlMenuLogo);
-        this.buttonLogoElement.classList.add("i-head-button");
-        this.buttonLogoElement.style.backgroundImage = `url("${browser.runtime.getURL("images/header_icon.png")}")`;
-        this.buttonElement.appendChild(this.buttonLogoElement);
+        const buttonLogoElement = document.createElement("div");
+        buttonLogoElement.classList.add(styles.controlMenuLogo);
+        buttonLogoElement.classList.add("i-head-button");
+        buttonLogoElement.style.backgroundImage = `url("${browser.runtime.getURL("images/header_icon.png")}")`;
+        this.buttonElement.appendChild(buttonLogoElement);
+
+        this.buttonDateElement = document.createElement("div");
+        this.buttonDateElement.className = styles.controlMenuButtonDate;
+        this.buttonElement.appendChild(this.buttonDateElement);
+
+        const menuPositionerDiv = document.createElement("div");
+        this.menuContainerElement.appendChild(menuPositionerDiv);
 
         this.menuElement = document.createElement("div");
         this.menuElement.className = styles.controlMenu;
-        this.menuElement.onclick = e => e.stopPropagation();
-        this.buttonElement.appendChild(this.menuElement);
+        menuPositionerDiv.appendChild(this.menuElement);
 
         const menuHeaderElement = document.createElement("header");
         menuHeaderElement.className = styles.controlMenuHeader;
         this.menuElement.appendChild(menuHeaderElement);
 
-        this.createSnapshotButton = document.createElement("div");
-        this.createSnapshotButton.textContent = "Create"
-        this.createSnapshotButton.classList.add(styles.controlMenuHeaderButton, styles.createIcon);
-        this.createSnapshotButton.onclick = () => this.onCreateSnapshotRequest.post();
-        menuHeaderElement.appendChild(this.createSnapshotButton);
+        const createSnapshotButton = document.createElement("div");
+        createSnapshotButton.textContent = "Create"
+        createSnapshotButton.classList.add(styles.controlMenuHeaderButton, styles.createIcon);
+        createSnapshotButton.onclick = () => this.onCreateSnapshotRequest.post();
+        menuHeaderElement.appendChild(createSnapshotButton);
 
         this.cancelCompareButton = document.createElement("div");
         this.cancelCompareButton.textContent = "Cancel";
@@ -54,6 +67,10 @@ export class ControlMenu {
 
         this.snapshotList = new SnapshotList();
         this.menuElement.appendChild(this.snapshotList.element);
+        
+        this.updateButtonDateText();
+        setInterval(() => this.updateButtonDateText(), 60 * 1000);
+        this.onSelectedSnapshotDateChange.attach(() => this.updateButtonDateText());
     }
 
     public set selectedSnapshotDate(date: Date | null) {
@@ -84,7 +101,7 @@ export class ControlMenu {
     }
     
     private onBodyClick(e: MouseEvent) {
-        if (e.target != this.buttonElement && e.target != this.buttonLogoElement)
+        if (!e.composedPath().includes(this.buttonElement))
             this.toggleMenuOpen(false);
     }
 
@@ -108,7 +125,17 @@ export class ControlMenu {
             return;
         
         this.open = open;
-        this.buttonElement.classList.toggle(styles.controlMenuButtonOpen, open);
+        this.buttonElement.classList.toggle(styles.controlMenuButtonActive, open);
         this.menuElement.classList.toggle(styles.controlMenuOpen, open);
+    }
+
+    private updateButtonDateText() {
+        if (!this.snapshotList.selectedItem) {
+            this.buttonDateElement.textContent = "";
+            return;
+        }
+        
+        this.buttonDateElement.textContent = 
+            "@" + moment(this.snapshotList.selectedItem.date).calendar(undefined, pastOnlyShortCalendarFormat);
     }
 }

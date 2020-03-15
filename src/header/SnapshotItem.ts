@@ -30,7 +30,7 @@ export class SnapshotItem {
         this.element.classList.toggle(styles.snapshotItemSelected, value);
     }
 
-    public updateTextContent() {
+    private updateTextContent() {
         this.dateElement.textContent = `${moment(this.date).calendar()} (${moment(this.date).fromNow()})`;
     }
 }
