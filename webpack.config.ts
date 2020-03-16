@@ -3,6 +3,7 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import WebpackShellPluginNext from 'webpack-shell-plugin-next';
+import ZipPlugin from 'zip-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import { ConfigurationFactory, WatchIgnorePlugin } from 'webpack';
 const ExtensionReloader = require('webpack-extension-reloader');
@@ -68,7 +69,6 @@ const config: ConfigurationFactory = (_env, argv) => {
             ],
         },
         plugins: [
-            ...(watchMode ? [] : [new CleanWebpackPlugin()]),
             new CopyWebpackPlugin([
                 'src/manifest.json',
                 { from: 'src/images/*.png', to: 'images/[name].[ext]' }
@@ -85,8 +85,15 @@ const config: ConfigurationFactory = (_env, argv) => {
                             parallel: true
                         }
                     })]
-                : [])
-        ]
+                : [
+                    new CleanWebpackPlugin(),
+                    ...(devMode ? [] : [new ZipPlugin({filename: "dist.zip"})])
+                ])
+        ],
+        performance: {
+            maxEntrypointSize: 1048576, // 1MiB
+            maxAssetSize: 1048576 // 1MiB
+        }
     };
 };
 
