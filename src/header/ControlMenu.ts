@@ -5,12 +5,14 @@ import { SnapshotItem } from "./SnapshotItem";
 import { SyncEvent } from "ts-events";
 import moment from "moment";
 import { pastOnlyShortCalendarFormat } from "../Utils";
+import { StorageInfo } from "./StorageInfo";
 
 export class ControlMenu {
     private open: boolean = false;
     private readonly menuElement: HTMLElement;
     private readonly buttonElement: HTMLElement;
     private readonly snapshotList: SnapshotList;
+    private readonly storageInfo: StorageInfo;
 
     public readonly menuContainerElement: HTMLElement;
 
@@ -21,7 +23,8 @@ export class ControlMenu {
     constructor() {
         this.buttonElement = this.createMenuButtonElement();
         this.snapshotList = new SnapshotList();
-        this.menuElement = this.createMenuElement(this.snapshotList);
+        this.storageInfo = new StorageInfo();
+        this.menuElement = this.createMenuElement(this.snapshotList, this.storageInfo);
 
         const menuPositionerDiv = document.createElement("div");
         menuPositionerDiv.appendChild(this.menuElement);
@@ -49,7 +52,12 @@ export class ControlMenu {
         this.snapshotList.add(this.newSnapshotItem(date));
     }
 
-    private createFooterElement(): HTMLElement {
+    public updateStorageInfo(bytesInUse?: number, bytesTotal?: number) {
+        this.storageInfo.bytesInUse = bytesInUse ?? null;
+        this.storageInfo.bytesTotal = bytesTotal ?? null;
+    }
+
+    private createFooterElement(storageInfo: StorageInfo): HTMLElement {
         const footer = document.createElement("footer");
         footer.className = styles.controlMenuFooter;
 
@@ -63,6 +71,7 @@ export class ControlMenu {
         extensionInfoLink.textContent = manifest.name + " v" + manifest.version;
         extensionInfo.appendChild(extensionInfoLink);
 
+        footer.appendChild(storageInfo.element);
         return footer;
     }
 
@@ -118,12 +127,12 @@ export class ControlMenu {
         return button;
     }
 
-    private createMenuElement(snapshotList: SnapshotList): HTMLElement {
+    private createMenuElement(snapshotList: SnapshotList, storageInfo: StorageInfo): HTMLElement {
         const menu = document.createElement("div");
         menu.className = styles.controlMenu;
         menu.appendChild(this.createHeaderElement());
         menu.appendChild(snapshotList.element);
-        menu.appendChild(this.createFooterElement());
+        menu.appendChild(this.createFooterElement(storageInfo));
         return menu
     }
 

@@ -141,6 +141,8 @@ $control-menu-item-color: #777777;
         }
 
         .control-menu-footer {
+            display: flex;
+            justify-content: space-between;
             font-size: x-small;
             color: $control-menu-item-color;
             padding: 0 12px;

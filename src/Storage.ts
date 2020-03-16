@@ -2,6 +2,8 @@ import { browser } from "webextension-polyfill-ts";
 import { PortfolioListViewSnapshot } from "./portfolio";
 import { AccountSnapshot } from "./footer";
 
+type BytesUsage = { used: number, total: number };
+
 export type Snapshot = {
     account: AccountSnapshot,
     portfolio: PortfolioListViewSnapshot
@@ -15,6 +17,10 @@ type StorageModel = {
 }
 
 class SyncStorage {
+    public async getBytesUsage(): Promise<BytesUsage | null> {
+        return await getBytesUsage();
+    }
+    
     public async getSnapshotDates(): Promise<Date[]> {
         return this.getSnapshotDateTimes()
             .then(times => times.map(n => new Date(n)));
@@ -69,6 +75,22 @@ async function get<T>(key: keyof StorageModel): Promise<T | undefined> {
     }
 
     return storage[key];
+}
+
+async function getBytesUsage(keys?: null | string | string[]): Promise<BytesUsage | null> {
+    const browser = (window as any).chrome;
+    const sync = browser?.storage?.sync;
+    if (!sync || !sync.getBytesInUse || !sync.QUOTA_BYTES)
+        return null;
+
+    return new Promise<BytesUsage>((resolve: (value: BytesUsage) => void, reject: (reason?: any) => void) => {
+        sync.getBytesInUse(keys, (bytesInUse: number) => {
+            if (browser.runtime.lastError)
+                reject(browser.runtime.lastError);
+            else
+                resolve({ used: bytesInUse, total: sync.QUOTA_BYTES });
+        });
+    });
 }
 
 function normalizeKey(key: keyof StorageModel): string {

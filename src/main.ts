@@ -49,12 +49,14 @@ function initializeUiLayout(elem: Element) {
 		header = h;
 
 		const selectedSnapshotDate = await storage.getSelectedSnapshotDate();
+		const storageInfo = await storage.getBytesUsage();
 
 		header.controlMenu.snapshotDates = await storage.getSnapshotDates();
 		header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
 		header.controlMenu.onCreateSnapshotRequest.attach(onCreateSnapshotRequest);
 		header.controlMenu.onSelectedSnapshotDateChange.attach(onSelectedSnapshotDateChange);
 		header.controlMenu.onDeleteSnapshot = onDeleteSnapshot;
+		header.controlMenu.updateStorageInfo(storageInfo?.used, storageInfo?.total);
 
 		await onSelectedSnapshotDateChange(selectedSnapshotDate, false);
 	});
