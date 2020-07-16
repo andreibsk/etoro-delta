@@ -1,6 +1,6 @@
 {
   "name": "eToro Delta",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Display changes in eToro portfolio page",
   "permissions": [
     "storage"
@@ -32,5 +32,6 @@
   "web_accessible_resources": [
     "images/*.png"
   ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgJHwVcreoBFIm3cBcdkMIkXhEqZLWePu4Gegn5s0WCyFRHYeIupD4R9SeyB0sKZGnWPc84xVK8aLEbEdlQSMM2+5LQV9G/yOeq0ze9tOEsT/lRqdC0Zrngdbvg/Zy2iR/iJDaJUVs9ggfL6IXxMOByxwV4op8JAPIREMQLpwfho4HbXr8+3igZIBq4eo2J+8NyB9CmRp1UFkUnKy8/dd8h4AF/e2/aDqKyoFGx9Ias6mPHI+yS620bvMICo3mszwSvBBmvgltUODC45NQU1bHuAy5iZrBAUTuczNbKmYrHnRz7DcbPK7yuNCxM19+Sn3gJA/xmSiVtLuOWOHMpWjkwIDAQAB",
   "manifest_version": 2
 }
