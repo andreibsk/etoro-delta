@@ -40,10 +40,12 @@ function initializeUiLayout(elem: Element) {
 		console.assert(header, "Portfolio mounted before the header.");
 		portfolio = p;
 		portfolio.compareSnapshot = selectedSnapshot === null ? null : selectedSnapshot.portfolio;
+		header.controlMenu.createSnapshotEnabled = true;
 	});
 	uiLayout.portfolioRemoved.attach(() => {
 		console.debug("Portfolio removed.");
 		portfolio = null;
+		header.controlMenu.createSnapshotEnabled = false;
 	});
 
 	uiLayout.headerAdded.attach(async (h: Header) => {

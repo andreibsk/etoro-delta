@@ -107,7 +107,7 @@ $control-menu-item-color: #777777;
 
         .control-menu-header {
             display: flex;
-            flex-direction: row;
+            flex-direction: row-reverse;
             justify-content: space-between;
             border-bottom: $control-menu-item-border;
             color: $control-menu-item-color;

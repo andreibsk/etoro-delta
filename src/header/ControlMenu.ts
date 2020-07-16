@@ -11,6 +11,7 @@ export class ControlMenu {
     private open: boolean = false;
     private readonly menuElement: HTMLElement;
     private readonly buttonElement: HTMLElement;
+    private readonly createSnapshotButtonElement: HTMLElement;
     private readonly snapshotList: SnapshotList;
     private readonly storageInfo: StorageInfo;
 
@@ -21,6 +22,7 @@ export class ControlMenu {
     public onDeleteSnapshot: ((date: Date) => Promise<boolean>) | null = null;
 
     constructor() {
+        this.createSnapshotButtonElement = this.createCreateSnapshotElement();
         this.buttonElement = this.createMenuButtonElement();
         this.snapshotList = new SnapshotList();
         this.storageInfo = new StorageInfo();
@@ -33,6 +35,10 @@ export class ControlMenu {
         this.menuContainerElement.className = styles.controlMenuContainer;
         this.menuContainerElement.appendChild(this.buttonElement);
         this.menuContainerElement.appendChild(menuPositionerDiv);
+    }
+
+    public set createSnapshotEnabled(enabled: boolean) {
+        this.createSnapshotButtonElement.style.display = enabled ? "" : "none";
     }
 
     public set selectedSnapshotDate(date: Date | null) {
@@ -75,12 +81,16 @@ export class ControlMenu {
         return footer;
     }
 
-    private createHeaderElement(): HTMLElement {
+    private createCreateSnapshotElement(): HTMLElement {
         const createSnapshotButton = document.createElement("div");
         createSnapshotButton.textContent = "Create"
         createSnapshotButton.classList.add(styles.controlMenuHeaderButton, styles.createIcon);
         createSnapshotButton.onclick = () => this.onCreateSnapshotRequest.post();
 
+        return createSnapshotButton;
+    }
+
+    private createHeaderElement(): HTMLElement {
         const cancelButton = document.createElement("div");
         cancelButton.textContent = "Cancel";
         cancelButton.classList.add(styles.controlMenuHeaderButton, styles.cancelIcon);
@@ -91,8 +101,8 @@ export class ControlMenu {
 
         const header = document.createElement("header");
         header.className = styles.controlMenuHeader;
-        header.appendChild(createSnapshotButton);
         header.appendChild(cancelButton);
+        header.appendChild(this.createSnapshotButtonElement);
         return header;
     }
 
