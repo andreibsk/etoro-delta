@@ -48,6 +48,7 @@ $control-menu-item-color: #777777;
 .control-menu-container {
     display: inline-flex;
     flex-direction: column;
+    float: left;
 
     .control-menu-button {
         display: inline-flex;

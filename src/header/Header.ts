@@ -2,7 +2,7 @@ import { ControlMenu } from "./ControlMenu";
 
 const selector = {
     header: "header.a-header",
-    toolbox: ".a-head-toolbox"
+    headerInnerWrapper: ".layout-header-inner-wrapper"
 }
 
 export class Header {
@@ -17,7 +17,7 @@ export class Header {
 
         this.controlMenu = new ControlMenu();
         element
-            .querySelector(selector.toolbox)!
+            .querySelector(selector.headerInnerWrapper)!
             .prepend(this.controlMenu.menuContainerElement);
     }
 }
