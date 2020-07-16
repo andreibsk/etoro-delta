@@ -69,10 +69,12 @@ const config: ConfigurationFactory = (_env, argv) => {
             ],
         },
         plugins: [
-            new CopyWebpackPlugin([
-                'src/manifest.json',
-                { from: 'src/images/*.png', to: 'images/[name].[ext]' }
-            ]),
+            new CopyWebpackPlugin({
+                patterns: [
+                    'src/manifest.json',
+                    { from: 'src/images/*.png', to: 'images/[name].[ext]' }
+                ]
+            }),
             new MiniCssExtractPlugin(),
             new ForkTsCheckerWebpackPlugin({ async: false }),
             new WatchIgnorePlugin([/scss\.d\.ts$/]),
@@ -87,7 +89,7 @@ const config: ConfigurationFactory = (_env, argv) => {
                     })]
                 : [
                     new CleanWebpackPlugin(),
-                    ...(devMode ? [] : [new ZipPlugin({filename: "dist.zip"})])
+                    ...(devMode ? [] : [new ZipPlugin({ filename: "dist.zip" })])
                 ])
         ],
         performance: {
