@@ -4,8 +4,10 @@ import { storage, Snapshot } from "./Storage";
 import { Header } from "./header";
 import { EtAccountBalanceFooter } from "./footer";
 import { filter } from "./Utils";
+import { browser } from "webextension-polyfill-ts";
 
-console.log('eToro Delta loaded.');
+const manifest = browser.runtime.getManifest();
+console.log(manifest.name + " v" + manifest.version + ' loaded.');
 
 let uiLayout: UiLayout;
 let header: Header;
