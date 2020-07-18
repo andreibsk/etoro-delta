@@ -1,3 +1,5 @@
+const percentUsageWarningThreshold = 90;
+
 export class StorageInfo {
     private readonly valueElement: HTMLElement;
 
@@ -26,12 +28,14 @@ export class StorageInfo {
 
     private updateInfo() {
         const usageKnown = this._bytesInUse != null && this._bytesTotal != null;
+        const percentInUse = (this._bytesInUse! / this._bytesTotal!) * 100;
 
-        this.valueElement.textContent = usageKnown
-            ? ((this._bytesInUse! / this._bytesTotal!) * 100).toFixed(0) + "%"
-            : "??";
+        this.valueElement.textContent = usageKnown ? percentInUse.toFixed(0) + "%" : "??";
         this.element.title = usageKnown
             ? (this._bytesInUse! / 1000).toFixed(2) + "/" + (this._bytesTotal! / 1000).toFixed() + " kB"
             : "";
+
+        this.element.classList.toggle("red", percentInUse > percentUsageWarningThreshold);
+        this.element.style.fontWeight = percentInUse > percentUsageWarningThreshold ? "bold" : "";
     }
 }
