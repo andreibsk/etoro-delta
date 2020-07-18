@@ -3,7 +3,7 @@ import { filter } from "../Utils";
 
 const selector = {
     element: "portfolio-list-view[view-state-mode='LIST']",
-    uiTableBody: "ui-table-body"
+    uiTableRows: "ui-table-body > " + PortfolioListRow.elementSelector
 }
 
 type PortfolioListRows = {
@@ -51,32 +51,47 @@ export class Portfolio {
         return snapshot as PortfolioListViewSnapshot;
     }
 
+    private initializeRow(elem: Element): PortfolioListRow {
+        const row = new PortfolioListRow(elem);
+        this.rows[row.marketName] = row;
+        return row;
+    }
+
     private initializeRows() {
-        const rowElements = this.element.querySelectorAll(selector.uiTableBody + " > " + PortfolioListRow.elementSelector);
-        for (const elem of rowElements) {
-            const row = new PortfolioListRow(elem);
-            this.rows[row.marketName] = row;
-        }
+        const rowElements = this.element.querySelectorAll(selector.uiTableRows);
+        for (const elem of rowElements)
+            this.initializeRow(elem);
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {
-        for (const mutation of filter(mutations, selector.uiTableBody)) {
+        for (const mutation of filter(mutations, selector.uiTableRows)) {
+            const element = mutation.element;
+
             if (mutation.added == true) {
-                console.debug("Table body added.");
-                this.initializeRows();
-                this.setRowCompareSnapshots();
+                const marketName = PortfolioListRow.tryGetMarketName(element);
+                if (marketName && this.rows[marketName])
+                    continue;
+
+                const row = this.initializeRow(element);
+                this.setRowCompareSnapshot(row);
+                console.debug("Portfolio row added: ", row.marketName);
             }
             else if (mutation.added == false) {
-                console.debug("Table body removed.");
-                for (const row in this.rows)
-                    delete this.rows[row];
+                const marketName = PortfolioListRow.tryGetMarketName(element);
+                if (marketName) {
+                    delete this.rows[marketName]
+                    console.debug("Portfolio row removed: ", marketName);
+                }
             }
         }
     }
 
+    private setRowCompareSnapshot(row: PortfolioListRow) {
+        row.compareSnapshot = this._compareSnapshot == null ? null : this._compareSnapshot[row.marketName];
+    }
+
     private setRowCompareSnapshots() {
-        var key: keyof PortfolioListRows;
-        for (key in this.rows)
-            this.rows[key].compareSnapshot = this._compareSnapshot == null ? null : this._compareSnapshot[key];
+        for (const key in this.rows)
+            this.setRowCompareSnapshot(this.rows[key]);
     }
 }

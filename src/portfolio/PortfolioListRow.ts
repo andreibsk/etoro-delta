@@ -1,4 +1,4 @@
-import { PortfolioListCell, PortfolioListCellSnapshot } from "./PortfolioListCell";
+import { PortfolioListCell, PortfolioListCellSnapshot, PortfolioListCellSelector } from "./PortfolioListCell";
 
 type PortfolioListRowCells = {
     marketName: PortfolioListCell,
@@ -30,8 +30,7 @@ export class PortfolioListRow {
 
     public set compareSnapshot(snapshot: PortfolioListRowSnapshot | null) {
         var cellKey: keyof PortfolioListRowCells;
-        for (cellKey in this.cells)
-        {
+        for (cellKey in this.cells) {
             if (cellKey == "marketName")
                 continue;
 
@@ -41,6 +40,17 @@ export class PortfolioListRow {
 
     public get marketName(): string {
         return this.cells.marketName.valueString;
+    }
+
+    public static tryGetMarketName(rowElement: Element): string | null {
+        if (!rowElement.matches(PortfolioListRow.elementSelector))
+            return null;
+
+        const marketNameCell = rowElement.querySelector(PortfolioListCellSelector.cell("market-name"));
+        if (!marketNameCell)
+            return null;
+
+        return marketNameCell.textContent!.trim();
     }
 
     public createSnapshot(): PortfolioListRowSnapshot {

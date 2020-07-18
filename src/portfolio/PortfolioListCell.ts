@@ -12,6 +12,7 @@ const selector = {
     cellContainer: (s: string) => `[${eIdAttributeName}='${cellContainerPrefix}${s}']`
 };
 
+export const PortfolioListCellSelector = selector;
 export type PortfolioListCellSnapshot = number;
 
 export class PortfolioListCell {
