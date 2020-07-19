@@ -40,6 +40,9 @@ export function* filter(records: MutationRecord[], ...selectors: string[])
             for (const child of children)
                 yield { element: child, added: false };
         }
+    }
+
+    for (const record of records) {
         for (const node of record.addedNodes) {
             if (!(node instanceof Element))
                 continue;

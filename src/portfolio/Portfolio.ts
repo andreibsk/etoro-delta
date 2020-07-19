@@ -66,10 +66,12 @@ export class Portfolio {
     private onMutationObserved(mutations: MutationRecord[]) {
         for (const mutation of filter(mutations, selector.uiTableRows)) {
             const element = mutation.element;
+            const marketName = PortfolioListRow.tryGetMarketName(element);
+            if (!marketName)
+                continue;
 
             if (mutation.added == true) {
-                const marketName = PortfolioListRow.tryGetMarketName(element);
-                if (marketName && this.rows[marketName])
+                if (this.rows[marketName])
                     continue;
 
                 const row = this.initializeRow(element);
@@ -77,11 +79,9 @@ export class Portfolio {
                 console.debug("Portfolio row added: ", row.marketName);
             }
             else if (mutation.added == false) {
-                const marketName = PortfolioListRow.tryGetMarketName(element);
-                if (marketName) {
-                    delete this.rows[marketName]
-                    console.debug("Portfolio row removed: ", marketName);
-                }
+                this.rows[marketName].compareSnapshot = null;
+                delete this.rows[marketName]
+                console.debug("Portfolio row removed: ", marketName);
             }
         }
     }
