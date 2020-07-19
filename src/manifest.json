@@ -1,6 +1,6 @@
 {
   "name": "eToro Delta",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Display changes in eToro portfolio page",
   "permissions": [
     "storage"
