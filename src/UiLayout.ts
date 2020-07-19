@@ -10,9 +10,12 @@ export class UiLayout {
 
     private readonly element: Element;
     private readonly observer: MutationObserver;
+    private oldVirtualMode: boolean;
     private portfolio?: Portfolio;
     private header?: Header;
     private footer?: EtAccountBalanceFooter;
+
+    public readonly virtualModeChanged = new SyncEvent<boolean>();
 
     public readonly portfolioAdded = new SyncEvent<Portfolio>();
     public readonly portfolioRemoved = new SyncEvent<Portfolio>();
@@ -28,6 +31,8 @@ export class UiLayout {
             throw new Error("Element doesn't match a UiLayout.");
 
         this.element = element;
+        this.oldVirtualMode = this.virtualMode;
+        this.portfolioAdded.attach(_ => this.onPortfolioAdded());
         this.observer = new MutationObserver(m => this.onMutationObserved(m));
 
         const portfolioElement = element.querySelector(Portfolio.selector);
@@ -43,6 +48,10 @@ export class UiLayout {
             this.footer = new EtAccountBalanceFooter(footerElement);
 
         this.observer.observe(this.element, UiLayout.observerOptions);
+    }
+
+    public get virtualMode(): boolean {
+        return this.element.querySelector(".demo-mode") != null;
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {
@@ -82,6 +91,13 @@ export class UiLayout {
                     this.footerRemoved.post(obj);
                 }
             }
+        }
+    }
+
+    private onPortfolioAdded() {
+        if (this.oldVirtualMode != this.virtualMode) {
+            this.oldVirtualMode = !this.oldVirtualMode;
+            this.virtualModeChanged.post(this.oldVirtualMode);
         }
     }
 }

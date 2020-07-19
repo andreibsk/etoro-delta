@@ -35,6 +35,13 @@ else {
 function initializeUiLayout(elem: Element) {
 	uiLayout = new UiLayout(elem);
 
+	uiLayout.virtualModeChanged.attach(async (virtual: boolean) => {
+		console.debug("Virtual mode changed:", virtual);
+		const selectedSnapshotDate = await storage.getSelectedSnapshotDate(virtual);
+		header.controlMenu.snapshotDates = await storage.getSnapshotDates(virtual);
+		header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
+	});
+
 	uiLayout.portfolioAdded.attach(async (p: Portfolio) => {
 		console.debug("Portfolio added.");
 		console.assert(header, "Portfolio mounted before the header.");
@@ -52,10 +59,10 @@ function initializeUiLayout(elem: Element) {
 		console.debug("Header added.");
 		header = h;
 
-		const selectedSnapshotDate = await storage.getSelectedSnapshotDate();
+		const selectedSnapshotDate = await storage.getSelectedSnapshotDate(uiLayout.virtualMode);
 		const storageInfo = await storage.getBytesUsage();
 
-		header.controlMenu.snapshotDates = await storage.getSnapshotDates();
+		header.controlMenu.snapshotDates = await storage.getSnapshotDates(uiLayout.virtualMode);
 		header.controlMenu.selectedSnapshotDate = selectedSnapshotDate;
 		header.controlMenu.onCreateSnapshotRequest.attach(onCreateSnapshotRequest);
 		header.controlMenu.onSelectedSnapshotDateChange.attach(onSelectedSnapshotDateChange);
@@ -91,9 +98,9 @@ async function onCreateSnapshotRequest() {
 		account: accountFooter.createSnapshot(),
 		portfolio: portfolio.createSnapshot()
 	};
-	const snapshotDate = await storage.addSnapshot(snapshot);
+	const snapshotDate = await storage.addSnapshot(snapshot, uiLayout.virtualMode);
 	header.controlMenu.addSnapshotDate(snapshotDate);
-	console.debug(`Snapshot saved (${snapshotDate.toLocaleString()}):`, snapshot);
+	console.debug(`Snapshot saved (${snapshotDate.toLocaleString()}, virtual: ${uiLayout.virtualMode}):`, snapshot);
 }
 
 async function onDeleteSnapshot(date: Date): Promise<boolean> {
@@ -117,5 +124,5 @@ async function onSelectedSnapshotDateChange(date: Date | null, save: boolean = t
 		accountFooter.compareSnapshot = snapshot === null ? null : snapshot.account;
 
 	if (save)
-		await storage.setSelectedSnapshotDate(date);
+		await storage.setSelectedSnapshotDate(date, uiLayout.virtualMode);
 }

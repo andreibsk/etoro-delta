@@ -13,6 +13,9 @@ type StorageModel = {
     snapshots: number[],
     selectedSnapshot: number | null,
 
+    virtualSnapshots: number[],
+    virtualSelectedSnapshot: number | null,
+
     [snapshotKey: number]: Snapshot
 }
 
@@ -20,9 +23,9 @@ class SyncStorage {
     public async getBytesUsage(): Promise<BytesUsage | null> {
         return await getBytesUsage();
     }
-    
-    public async getSnapshotDates(): Promise<Date[]> {
-        return this.getSnapshotDateTimes()
+
+    public async getSnapshotDates(virtual: boolean): Promise<Date[]> {
+        return this.getSnapshotDateTimes(virtual)
             .then(times => times.map(n => new Date(n)));
     }
 
@@ -30,39 +33,47 @@ class SyncStorage {
         return await get(snapshotKey(date));
     }
 
-    public async addSnapshot(snapshot: Snapshot): Promise<Date> {
+    public async addSnapshot(snapshot: Snapshot, virtual: boolean): Promise<Date> {
         const date = new Date();
 
-        const snapshotDateTimes = await this.getSnapshotDateTimes();
+        const snapshotDateTimes = await this.getSnapshotDateTimes(virtual);
         snapshotDateTimes.push(date.getTime());
 
         await set(
-            "snapshots", snapshotDateTimes,
+            virtual ? "virtualSnapshots" : "snapshots", snapshotDateTimes,
             snapshotKey(date), snapshot)
 
         return date;
     }
 
-    public async removeSnapshot(date: Date): Promise<boolean> {
-        const time = date.getTime();
-        const snapshotTimes = await this.getSnapshotDateTimes();
-        const removedTimes = snapshotTimes.splice(snapshotTimes.indexOf(time), 1);
+    public async removeSnapshot(date: Date): Promise<boolean>;
+    public async removeSnapshot(date: Date, virtual: boolean): Promise<boolean>;
+    public async removeSnapshot(date: Date, virtual?: boolean): Promise<boolean> {
+        if (virtual === undefined)
+            return this.removeSnapshot(date, false) || this.removeSnapshot(date, true);
 
+        const time = date.getTime();
+        const snapshotTimes = await this.getSnapshotDateTimes(virtual);
+        const index = snapshotTimes.indexOf(time);
+        if (index == -1)
+            return false;
+
+        const removedTimes = snapshotTimes.splice(index, 1);
         await set("snapshots", snapshotTimes);
         return await remove(...removedTimes);
     }
 
-    public async setSelectedSnapshotDate(date: Date | null) {
-        await set("selectedSnapshot", date ? date.getTime() : null);
+    public async setSelectedSnapshotDate(date: Date | null, virtual: boolean) {
+        await set(virtual ? "virtualSelectedSnapshot" : "selectedSnapshot", date ? date.getTime() : null);
     }
 
-    public async getSelectedSnapshotDate(): Promise<Date | null> {
-        const date = await get<Date>("selectedSnapshot");
+    public async getSelectedSnapshotDate(virtual: boolean): Promise<Date | null> {
+        const date = await get<Date>(virtual ? "virtualSelectedSnapshot" : "selectedSnapshot");
         return !date ? null : new Date(date);
     }
 
-    private async getSnapshotDateTimes(): Promise<number[]> {
-        return await get<number[]>("snapshots") ?? [];
+    private async getSnapshotDateTimes(virtual: boolean): Promise<number[]> {
+        return await get<number[]>(virtual ? "virtualSnapshots" : "snapshots") ?? [];
     }
 }
 
