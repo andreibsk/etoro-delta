@@ -2,8 +2,7 @@ import { PortfolioListRow, PortfolioListRowSnapshot } from "./PortfolioListRow";
 import { filter } from "../Utils";
 
 const selector = {
-    element: "portfolio-list-view[view-state-mode='LIST']",
-    uiTableRows: "ui-table-body > " + PortfolioListRow.elementSelector
+    element: "portfolio-list-view[view-state-mode='LIST']"
 }
 
 type PortfolioListRows = {
@@ -58,13 +57,13 @@ export class Portfolio {
     }
 
     private initializeRows() {
-        const rowElements = this.element.querySelectorAll(selector.uiTableRows);
+        const rowElements = this.element.querySelectorAll(PortfolioListRow.elementSelector);
         for (const elem of rowElements)
             this.initializeRow(elem);
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {
-        for (const mutation of filter(mutations, selector.uiTableRows)) {
+        for (const mutation of filter(mutations, PortfolioListRow.elementSelector)) {
             const element = mutation.element;
             const marketName = PortfolioListRow.tryGetMarketName(element);
             if (!marketName)
