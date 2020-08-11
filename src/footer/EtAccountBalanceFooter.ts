@@ -5,7 +5,7 @@ type FooterUnits = {
     total: FooterUnit
 };
 export type AccountSnapshot = {
-    [P in keyof FooterUnits]: FooterUnitSnapshot;
+    [P in keyof FooterUnits]: FooterUnitSnapshot
 };
 
 export class EtAccountBalanceFooter {

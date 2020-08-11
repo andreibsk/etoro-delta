@@ -12,7 +12,11 @@ const selector = {
     unit: (s: string) => `[${eIdAttributeName}='${unitPrefix}-${s}']`
 };
 
-export type FooterUnitSnapshot = number;
+// value only implies default currency of USD ($)
+export type FooterUnitSnapshot = number | {
+    value: number,
+    currency: string
+};
 
 export class FooterUnit {
     private readonly element: Element;
@@ -20,6 +24,7 @@ export class FooterUnit {
     private readonly valuePercentElement: Element | null;
 
     private delta: Delta | null;
+    private compareCurrency: string | null = null;
     private _compareValue: number | null = null;
     private _compareValueTotal: number | null = null;
     private readonly displayDeltaPercent: boolean;
@@ -60,21 +65,11 @@ export class FooterUnit {
 
     private set compareValue(value: number | null) {
         this._compareValue = value;
+        this.updateDeltaValues();
+    }
 
-        if (value != null) {
-            if (this.delta == null) {
-                this.delta = new Delta();
-                this.element.insertBefore(this.delta.element, this.valueElement.nextSibling);
-            }
-
-            this.updateDeltaValues();
-        }
-        else {
-            if (this.delta != null) {
-                this.delta.element.remove();
-                this.delta = null;
-            }
-        }
+    public get compareValueTotal(): number | null {
+        return this._compareValueTotal;
     }
 
     public set compareValueTotal(value: number | null) {
@@ -82,16 +77,33 @@ export class FooterUnit {
         this.updateDeltaValues();
     }
 
+    public get currency(): string | null {
+        const c = this.valueElement.childNodes[0].nodeValue!.match(/[^\d]+/);
+        return c ? c[0] : null;
+    }
+
     public get value(): number {
-        return parseFloat(this.valueElement.childNodes[0].nodeValue!.trim().replace(/[$%<>,]/g, ""));
+        return parseFloat(this.valueElement.childNodes[0].nodeValue!.match(/[\d,]+\.\d\d/)![0].replace(",", ""));
     }
 
     public set compareSnapshot(snapshot: FooterUnitSnapshot | null) {
-        this.compareValue = snapshot;
+        if (typeof snapshot === "number") {
+            this.compareCurrency = null;
+            this.compareValue = snapshot;
+        }
+        else {
+            this.compareCurrency = snapshot?.currency ?? null;
+            this.compareValue = snapshot?.value ?? null;
+        }
     }
 
     public createSnapshot(): FooterUnitSnapshot {
-        return this.value;
+        return this.currency
+            ? {
+                value: this.value,
+                currency: this.currency
+            }
+            : this.value;
     }
 
     private onValueMutationObserved() {
@@ -100,19 +112,30 @@ export class FooterUnit {
     }
 
     private updateDeltaValues() {
-        if (this.delta != null) {
-            const deltaValue = this.compareValue == null ? 0 : this.value - this._compareValue!;
+        if (this.compareValue != null && this.currency === (this.compareCurrency ?? "$")) {
+            if (this.delta == null) {
+                this.delta = new Delta();
+                this.element.insertBefore(this.delta.element, this.valueElement.nextSibling);
+            }
+
+            const deltaValue = this.compareValue == null ? 0 : this.value - this.compareValue;
             this.delta.value = deltaValue;
 
-            if (this.displayDeltaPercent)
-                this.delta.percentValue = this._compareValueTotal
-                    ? deltaValue * 100 / this._compareValueTotal
-                    : (this.value - this._compareValue!) * 100 / this._compareValue!;
-        }
+            if (this.displayDeltaPercent && this.compareValue)
+                this.delta.percentValue = this.compareValueTotal
+                    ? deltaValue * 100 / this.compareValueTotal
+                    : (this.value - this.compareValue) * 100 / this.compareValue;
 
-        if (this.valuePercentElement && this._compareValueTotal) {
-            const valuePercent = this.value * 100 / this._compareValueTotal;
-            this.valuePercentElement.textContent = valuePercent ? ` (${valuePercent.toFixed(2)}%)` : "";
+            if (this.valuePercentElement && this.compareValueTotal) {
+                const valuePercent = this.value * 100 / this.compareValueTotal;
+                this.valuePercentElement.textContent = valuePercent ? ` (${valuePercent.toFixed(2)}%)` : "";
+            }
+        }
+        else {
+            if (this.delta != null) {
+                this.delta.element.remove();
+                this.delta = null;
+            }
         }
     }
 }
