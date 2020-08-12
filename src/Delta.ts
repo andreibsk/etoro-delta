@@ -12,13 +12,14 @@ export class Delta {
     private readonly arrowElement: HTMLElement | undefined;
 
     constructor({ value = 0.00, percentValue, mode = "positiveNegative" }: { value?: number; percentValue?: number; mode?: Mode; } = {}) {
+        this.mode = mode;
+
         this.element = document.createElement("div");
         this.element.className = styles.delta;
         if (this.mode === "positiveNegative")
             this.element.appendChild(this.arrowElement = document.createElement("span"));
         this.element.appendChild(this.textNode = document.createTextNode(""));
 
-        this.mode = mode;
         this.value = value;
         this.percentValue = percentValue;
     }
