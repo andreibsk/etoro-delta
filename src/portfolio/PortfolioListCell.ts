@@ -1,4 +1,4 @@
-import { Delta } from "../Delta";
+import { Delta, Mode } from "../Delta";
 
 const cellPrefix: string = "portfolio-overview-table-body-cell";
 const cellContainerPrefix: string = "portfolio-overview-table-cell-container-";
@@ -21,10 +21,10 @@ export class PortfolioListCell {
 
     private cellDelta: Delta | null;
     private _compareValue: number | null = null;
-    private readonly compareEnabled: boolean;
+    private readonly compare: false | Mode;
     private readonly compareObserver: MutationObserver;
 
-    constructor(parentElement: Element, name: string, valueName?: string, compareEnabled: boolean = true) {
+    constructor(parentElement: Element, name: string, valueName?: string, compare: false | Mode = "positiveNegative") {
         const element = parentElement.querySelector(selector.cellContainer(name));
         const valueElement = element?.querySelector(selector.cell(valueName ?? name));
         if (!element || !valueElement || valueElement.textContent == null)
@@ -32,7 +32,7 @@ export class PortfolioListCell {
 
         this.element = element;
         this.valueElement = valueElement;
-        this.compareEnabled = compareEnabled;
+        this.compare = compare;
         this.compareObserver = new MutationObserver((m, o) => this.onDeltaChanged(m, o));
     }
 
@@ -41,7 +41,7 @@ export class PortfolioListCell {
     }
 
     private set compareValue(value: number | null) {
-        if (!this.compareEnabled)
+        if (!this.compare)
             return;
 
         this.compareObserver.disconnect();
@@ -50,7 +50,7 @@ export class PortfolioListCell {
         if (value != null) {
             this.compareObserver.observe(this.valueElement, valueObserveOptions);
             if (this.cellDelta == null) {
-                this.cellDelta = new Delta();
+                this.cellDelta = new Delta({ mode: this.compare });
                 this.element.appendChild(this.cellDelta.element);
             }
             this.cellDelta.value = this.value - value;
@@ -76,7 +76,7 @@ export class PortfolioListCell {
     }
 
     private onDeltaChanged(_m: MutationRecord[], _o: MutationObserver) {
-        if (this.compareEnabled && this.cellDelta != null)
+        if (this.compare && this.cellDelta != null)
             this.cellDelta.value = this.compareValue == null ? 0 : this.value - this.compareValue;
     }
 

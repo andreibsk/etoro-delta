@@ -3,7 +3,10 @@ import { PortfolioListCell, PortfolioListCellSnapshot, PortfolioListCellSelector
 type PortfolioListRowCells = {
     marketName: PortfolioListCell,
     profit: PortfolioListCell,
-    gain: PortfolioListCell
+    gain: PortfolioListCell,
+    fees: PortfolioListCell,
+    invested: PortfolioListCell,
+    openRate?: PortfolioListCell
 };
 
 export type PortfolioListRowSnapshot = Omit<{
@@ -24,7 +27,10 @@ export class PortfolioListRow {
         this.cells = {
             marketName: new PortfolioListCell(this.element, "action", "market-name", false),
             profit: new PortfolioListCell(this.element, "container-profit", "profit"),
-            gain: new PortfolioListCell(this.element, "gain")
+            gain: new PortfolioListCell(this.element, "gain"),
+            fees: new PortfolioListCell(this.element, "fees"),
+            invested: new PortfolioListCell(this.element, "invested", "invested-value", "neutral"),
+            openRate: this.isPerson ? undefined : new PortfolioListCell(this.element, "open-rate", "avg-open-rate", "neutral")
         };
     }
 
@@ -34,8 +40,20 @@ export class PortfolioListRow {
             if (cellKey == "marketName")
                 continue;
 
-            this.cells[cellKey].compareSnapshot = snapshot == null ? null : snapshot[cellKey];
+            const rowCell = this.cells[cellKey];
+            if (rowCell)
+                rowCell.compareSnapshot = snapshot == null ? null : (snapshot[cellKey] ?? null);
         }
+    }
+
+    public get isPerson(): boolean {
+        var person = this.element.querySelector("[data-etoro-automation-id='portfolio-overview-table-body-cell-market-mirror-display-name']") !== null;
+        var stock =  this.element.querySelector("[data-etoro-automation-id='portfolio-overview-table-body-cell-market-last-name']") !== null;
+
+        if (person === stock)
+            throw "Could not determine if PortfolioListRow is person.";
+
+        return person;        
     }
 
     public get marketName(): string {
@@ -61,7 +79,9 @@ export class PortfolioListRow {
             if (key == "marketName")
                 continue;
 
-            snapshot[key] = this.cells[key].createSnapshot();
+            const rowCell = this.cells[key];
+            if (rowCell)
+                snapshot[key] = rowCell.createSnapshot();
         }
 
         return snapshot as PortfolioListRowSnapshot;
