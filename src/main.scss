@@ -1,6 +1,10 @@
 .delta {
     color: #888888;
     font-size: 13px;
+
+    :global(.current-num-outline) + & {
+        padding-right: 5px;
+    }
 }
 
 @mixin arrow-sign {
@@ -40,6 +44,11 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+    }
+
+    .current-num-outline[data-etoro-automation-id="portfolio-overview-table-body-cell-last-price"]  {
+        padding-top: 1px;
+        padding-bottom: 1px;
     }
 }
 

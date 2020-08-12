@@ -2,11 +2,13 @@ import { PortfolioListCell, PortfolioListCellSnapshot, PortfolioListCellSelector
 
 type PortfolioListRowCells = {
     marketName: PortfolioListCell,
-    profit: PortfolioListCell,
-    gain: PortfolioListCell,
-    fees: PortfolioListCell,
-    invested: PortfolioListCell,
-    openRate?: PortfolioListCell
+    profit?: PortfolioListCell,
+    gain?: PortfolioListCell,
+    fees?: PortfolioListCell,
+    invested?: PortfolioListCell,
+    netInvested?: PortfolioListCell,
+    openRate?: PortfolioListCell,
+    lastPrice?: PortfolioListCell
 };
 
 export type PortfolioListRowSnapshot = Omit<{
@@ -24,13 +26,19 @@ export class PortfolioListRow {
             throw new Error("Element doesn't match a PortfolioListRow.");
 
         this.element = element;
+        const marketName = PortfolioListCell.tryConstruct(this.element, "action", "market-name", false);
+        if (!marketName)
+            throw new Error("Element doesn't match a PortfolioListRow (market name not detected).");
+
         this.cells = {
-            marketName: new PortfolioListCell(this.element, "action", "market-name", false),
-            profit: new PortfolioListCell(this.element, "container-profit", "profit"),
-            gain: new PortfolioListCell(this.element, "gain"),
-            fees: new PortfolioListCell(this.element, "fees"),
-            invested: new PortfolioListCell(this.element, "invested", "invested-value", "neutral"),
-            openRate: this.isPerson ? undefined : new PortfolioListCell(this.element, "open-rate", "avg-open-rate", "neutral")
+            marketName: marketName,
+            profit: PortfolioListCell.tryConstruct(this.element, "container-profit", "profit"),
+            gain: PortfolioListCell.tryConstruct(this.element, "gain"),
+            fees: PortfolioListCell.tryConstruct(this.element, "fees"),
+            invested: PortfolioListCell.tryConstruct(this.element, "invested", "invested-value", "neutral"),
+            netInvested: PortfolioListCell.tryConstruct(this.element, "total-amount", "total-amount", "neutral"),
+            openRate: PortfolioListCell.tryConstruct(this.element, "open-rate", "avg-open-rate", "neutral"),
+            lastPrice: PortfolioListCell.tryConstruct(this.element, "last-price")
         };
     }
 
@@ -44,16 +52,6 @@ export class PortfolioListRow {
             if (rowCell)
                 rowCell.compareSnapshot = snapshot == null ? null : (snapshot[cellKey] ?? null);
         }
-    }
-
-    public get isPerson(): boolean {
-        var person = this.element.querySelector("[data-etoro-automation-id='portfolio-overview-table-body-cell-market-mirror-display-name']") !== null;
-        var stock =  this.element.querySelector("[data-etoro-automation-id='portfolio-overview-table-body-cell-market-last-name']") !== null;
-
-        if (person === stock)
-            throw "Could not determine if PortfolioListRow is person.";
-
-        return person;        
     }
 
     public get marketName(): string {

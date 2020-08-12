@@ -24,12 +24,7 @@ export class PortfolioListCell {
     private readonly compare: false | Mode;
     private readonly compareObserver: MutationObserver;
 
-    constructor(parentElement: Element, name: string, valueName?: string, compare: false | Mode = "positiveNegative") {
-        const element = parentElement.querySelector(selector.cellContainer(name));
-        const valueElement = element?.querySelector(selector.cell(valueName ?? name));
-        if (!element || !valueElement || valueElement.textContent == null)
-            throw new Error("No element found that matches a PortfolioListCell.");
-
+    private constructor(element: Element, valueElement: Element, compare: false | Mode = "positiveNegative") {
         this.element = element;
         this.valueElement = valueElement;
         this.compare = compare;
@@ -73,6 +68,15 @@ export class PortfolioListCell {
 
     public static elementSelector(name: string): string {
         return selector.cellContainer(name);
+    }
+
+    public static tryConstruct(parentElement: Element, name: string, valueName?: string, compare?: false | Mode): PortfolioListCell | undefined {
+        const element = parentElement.querySelector(selector.cellContainer(name));
+        const valueElement = element?.querySelector(selector.cell(valueName ?? name));
+
+        return element && valueElement && valueElement.textContent != null
+            ? new PortfolioListCell(element, valueElement, compare)
+            : undefined;
     }
 
     private onDeltaChanged(_m: MutationRecord[], _o: MutationObserver) {
