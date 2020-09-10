@@ -1,20 +1,20 @@
 import moment, { CalendarSpec } from "moment";
 
 export const pastOnlyShortCalendarFormat: CalendarSpec = {
-    lastDay : '[Yesterday] LT',
-    sameDay : 'LT',
-    nextDay : '',
-    lastWeek : 'dddd LT',
-    nextWeek : '',
-    sameElse : 'L LT'
+    lastDay: '[Yesterday] LT',
+    sameDay: 'LT',
+    nextDay: '',
+    lastWeek: 'dddd LT',
+    nextWeek: '',
+    sameElse: 'L LT'
 };
 export const pastOnlyCalendarFormat: CalendarSpec = {
-    lastDay : '[Yesterday at] LT',
-    sameDay : '[Today at] LT',
-    nextDay : '',
-    lastWeek : 'dddd [at] LT',
-    nextWeek : '',
-    sameElse : 'L LT'
+    lastDay: '[Yesterday at] LT',
+    sameDay: '[Today at] LT',
+    nextDay: '',
+    lastWeek: 'dddd [at] LT',
+    nextWeek: '',
+    sameElse: 'L LT'
 };
 moment.updateLocale("en", { calendar: pastOnlyCalendarFormat });
 
@@ -55,4 +55,40 @@ export function* filter(records: MutationRecord[], ...selectors: string[])
                 yield { element: child, added: true };
         }
     }
+}
+
+export type LocaleNumberInput = HTMLInputElement & {
+    localeNumberValue: number | null
+};
+
+export function createLocaleNumberInput(): LocaleNumberInput {
+    const elem = document.createElement("input");
+
+    Object.defineProperty(elem, "localeNumberValue", {
+        get: function localeNumberValue() {
+            return parseFloat(elem.value.replace(/,/g, "")) || null;
+        },
+        set: function localeNumberValue(v: number) {
+            elem.value = document.hasFocus() && document.activeElement == elem
+                ? v.toFixed(2)
+                : v.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+        }
+    });
+
+    elem.onfocus = () => {
+        elem.value = elem.value.replace(/,/g, "");
+        elem.type = "number";
+    };
+    elem.onblur = () => {
+        elem.type = "text";
+        elem.value = (parseFloat(elem.value) || "").toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    return elem as LocaleNumberInput;
 }
