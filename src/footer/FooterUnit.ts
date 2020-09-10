@@ -77,9 +77,9 @@ export class FooterUnit {
         this.updateDeltaValues();
     }
 
-    public get currency(): string | null {
+    public get customCurrency(): string | null {
         const c = this.valueElement.childNodes[0].nodeValue!.match(/[^\d]+/);
-        return c ? c[0] : null;
+        return c && c[0] != "$" ? c[0] : null;
     }
 
     public get value(): number {
@@ -98,10 +98,10 @@ export class FooterUnit {
     }
 
     public createSnapshot(): FooterUnitSnapshot {
-        return this.currency
+        return this.customCurrency
             ? {
                 value: this.value,
-                currency: this.currency
+                currency: this.customCurrency
             }
             : this.value;
     }
@@ -112,7 +112,7 @@ export class FooterUnit {
     }
 
     private updateDeltaValues() {
-        if (this.compareValue != null && this.currency === (this.compareCurrency ?? "$")) {
+        if (this.compareValue != null && this.customCurrency === (this.compareCurrency ?? "$")) {
             if (this.delta == null) {
                 this.delta = new Delta();
                 this.element.insertBefore(this.delta.element, this.valueElement.nextSibling);
