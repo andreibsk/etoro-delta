@@ -4,7 +4,7 @@ import { storage, Snapshot } from "./Storage";
 import { Header } from "./header";
 import { EtAccountBalanceFooter } from "./footer";
 import { filter } from "./Utils";
-import { browser } from "webextension-polyfill-ts";
+import { browser, Management } from "webextension-polyfill-ts";
 
 const manifest = browser.runtime.getManifest();
 console.log(manifest.name + " v" + manifest.version + ' loaded.');
@@ -24,7 +24,7 @@ else {
 		const mutationResult = filter(mutations, UiLayout.selector).next();
 		if (!mutationResult.value || mutationResult.value.added != true)
 			return;
-		
+
 		console.debug("UiLayout added.");
 		observer.disconnect();
 		initializeUiLayout(mutationResult.value.element);
@@ -128,3 +128,21 @@ async function onSelectedSnapshotDateChange(date: Date | null, save: boolean = t
 	if (save)
 		await storage.setSelectedSnapshotDate(date, uiLayout.virtualMode);
 }
+
+browser.runtime.onMessage.addListener((request, sender) => {
+	switch (request.type) {
+		case "extension_info":
+			const extensionInfo: Management.ExtensionInfo = request.extensionInfo;
+			if (extensionInfo.installType == "development") {
+				console.info(manifest.name, "is running in development mode. Press Ctrl+Q to reload the extension.");
+				document.onkeyup = e => {
+					if (e.ctrlKey && e.key == "q") {
+						console.log("Reloading extension and refreshing page...");
+						browser.runtime.sendMessage({ type: "reload_request" });
+					}
+				};
+			}
+			break;
+	}
+});
+browser.runtime.sendMessage({ type: "extension_info_request" });
