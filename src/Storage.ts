@@ -16,6 +16,8 @@ type StorageModel = {
     virtualSnapshots: number[],
     virtualSelectedSnapshot: number | null,
 
+    customDeltaValue: number | null,
+
     [snapshotKey: number]: Snapshot
 }
 
@@ -70,6 +72,14 @@ class SyncStorage {
     public async getSelectedSnapshotDate(virtual: boolean): Promise<Date | null> {
         const date = await get<Date>(virtual ? "virtualSelectedSnapshot" : "selectedSnapshot");
         return !date ? null : new Date(date);
+    }
+
+    public async getCustomDeltaValue(): Promise<number | null> {
+        return await get<number | null>("customDeltaValue") ?? null;
+    }
+
+    public async setCustomDeltaValue(value: number | null) {
+        await set("customDeltaValue", value);
     }
 
     private async getSnapshotDateTimes(virtual: boolean): Promise<number[]> {

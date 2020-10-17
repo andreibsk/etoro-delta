@@ -80,6 +80,8 @@ function initializeUiLayout(elem: Element) {
 		console.assert(header, "Footer mounted before the header.");
 		accountFooter = f;
 		accountFooter.compareSnapshot = selectedSnapshot === null ? null : selectedSnapshot.account;
+		accountFooter.customDeltaValue = await storage.getCustomDeltaValue();
+		accountFooter.customDeltaValueChanged.attach(value => storage.setCustomDeltaValue(value));
 	});
 	uiLayout.footerRemoved.attach(() => {
 		console.debug("Footer removed.");

@@ -1,3 +1,5 @@
+$delta-green: #6bad10;
+
 .delta {
     color: #888888;
     font-size: 13px;
@@ -197,7 +199,7 @@ $control-menu-item-color: #777777;
             
             &::after {
                 content: "Δ";
-                color: #6bad10;
+                color: $delta-green;
                 font-size: 25px;
                 line-height: 0;
             }
@@ -232,6 +234,48 @@ $control-menu-item-color: #777777;
 
         &:hover:not(.snapshot-item-selected) .snapshot-item-delete-button {
             display: inline-flex;
+        }
+    }
+}
+
+.custom-delta-footer {
+    padding: 13px 15px;
+
+    &:global(.currency-title-item):last-child {
+        border-top: 1px solid #d7d7d7;
+        border-bottom: none;
+    }
+
+    > :global(.currency-item):first-child {
+        font-size: unset;
+        font-weight: bold;
+    }
+    
+    i.delta-symbol {
+        color: $delta-green;
+        font-size: 30px;
+        font-weight: normal;
+        font-style: normal;
+        margin-left: 5px;
+        vertical-align: middle;
+
+        &::before {
+            content: "Δ";
+        }
+    }
+
+    input.custom-delta-input {
+        height: 43px;
+        vertical-align: middle;
+        border: 1px solid #dcdcdc;
+        border-radius: 3px;
+        font-size: 20px;
+        font-weight: bold;
+        width: 100%;
+        padding: 0 12px;
+
+        &::placeholder {
+            font-size: 16px;
         }
     }
 }

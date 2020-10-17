@@ -68,13 +68,13 @@ export function createLocaleNumberInput(): LocaleNumberInput {
         get: function localeNumberValue() {
             return parseFloat(elem.value.replace(/,/g, "")) || null;
         },
-        set: function localeNumberValue(v: number) {
+        set: function localeNumberValue(v: number | null) {
             elem.value = document.hasFocus() && document.activeElement == elem
-                ? v.toFixed(2)
-                : v.toLocaleString("en-US", {
+                ? v?.toFixed(2) ?? ""
+                : v?.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
-                });
+                }) ?? "";
         }
     });
 
