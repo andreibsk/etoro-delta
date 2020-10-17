@@ -1,17 +1,16 @@
-import CopyWebpackPlugin from 'copy-webpack-plugin';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import path from 'path';
-import WebpackShellPluginNext from 'webpack-shell-plugin-next';
-import ZipPlugin from 'zip-webpack-plugin';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import { ConfigurationFactory, WatchIgnorePlugin } from 'webpack';
-const ExtensionReloader = require('webpack-extension-reloader');
+import CopyWebpackPlugin from "copy-webpack-plugin";
+import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import path from "path";
+import WebpackShellPluginNext from "webpack-shell-plugin-next";
+import ZipPlugin from "zip-webpack-plugin";
+import { CleanWebpackPlugin } from "clean-webpack-plugin";
+import { Configuration, WatchIgnorePlugin } from "webpack";
 
-const config: ConfigurationFactory = (_env, argv) => {
-    const devMode = argv.mode === 'development';
-    const watchMode = (<any>argv).watch === true;
-    const devtool = devMode ? 'inline-source-map' : false;
+const config = (_env: any, argv: any): Configuration => {
+    const devMode = argv.mode === "development";
+    const watchMode = argv.watch === true;
+    const devtool = devMode ? "inline-source-map" : false;
 
     console.log("Development mode:", devMode);
     console.log("Watch mode:", watchMode);
@@ -20,7 +19,7 @@ const config: ConfigurationFactory = (_env, argv) => {
     return {
         devtool,
         stats: {
-            children: false
+            colors: true
         },
         entry:
         {
@@ -28,19 +27,19 @@ const config: ConfigurationFactory = (_env, argv) => {
             background: "./src/background.ts",
         },
         output: {
-            path: path.resolve(__dirname, 'dist/')
+            path: path.resolve(__dirname, "dist/")
         },
         resolve: {
-            extensions: ['.tsx', '.ts', '.js', '.scss'],
+            extensions: [".tsx", ".ts", ".js", ".scss"],
         },
         module: {
             rules: [
                 {
                     test: /\.tsx?$/,
-                    include: path.resolve(__dirname, 'src/'),
+                    include: path.resolve(__dirname, "src/"),
                     use: [
                         {
-                            loader: 'ts-loader',
+                            loader: "ts-loader",
                             options: {
                                 transpileOnly: true
                             }
@@ -49,21 +48,21 @@ const config: ConfigurationFactory = (_env, argv) => {
                 },
                 {
                     test: /\.scss$/,
-                    include: path.resolve(__dirname, 'src/'),
+                    include: path.resolve(__dirname, "src/"),
                     use: [
                         MiniCssExtractPlugin.loader,
                         {
-                            loader: 'css-loader',
+                            loader: "css-loader",
                             options: {
                                 importLoaders: 1,
                                 sourceMap: devMode,
                                 modules: {
                                     localIdentName: "[local]--[hash:base64:5]",
-                                },
-                                localsConvention: 'camelCaseOnly',
+                                    exportLocalsConvention: "camelCaseOnly"
+                                }
                             }
                         },
-                        'sass-loader'
+                        "sass-loader"
                     ]
                 }
             ],
@@ -71,30 +70,32 @@ const config: ConfigurationFactory = (_env, argv) => {
         plugins: [
             new CopyWebpackPlugin({
                 patterns: [
-                    'src/manifest.json',
-                    { from: 'src/images/*.png', to: 'images/[name].[ext]' }
+                    "src/manifest.json",
+                    { from: "src/images/*.png", to: "images/[name].[ext]" }
                 ]
             }),
             new MiniCssExtractPlugin(),
             new ForkTsCheckerWebpackPlugin({ async: false }),
-            new WatchIgnorePlugin([/scss\.d\.ts$/]),
+            new WatchIgnorePlugin({
+                paths: [/scss\.d\.ts$/]
+            }),
             ...(watchMode
                 ? [
-                    new ExtensionReloader({ manifest: path.resolve(__dirname, "src", "manifest.json") }),
                     new WebpackShellPluginNext({
                         onBuildEnd: {
-                            scripts: ['npx tsm -e default --watch --ignoreInitial src'],
+                            scripts: ["npx tsm -e default --watch --ignoreInitial src"],
                             parallel: true
                         }
-                    })]
+                    })
+                ]
                 : [
                     new CleanWebpackPlugin(),
                     ...(devMode ? [] : [new ZipPlugin({ filename: "dist.zip" })])
                 ])
         ],
         performance: {
-            maxEntrypointSize: 1048576, // 1MiB
-            maxAssetSize: 1048576 // 1MiB
+            maxEntrypointSize: devMode ? 10_485_760 : 1_048_576,
+            maxAssetSize: devMode ? 10_485_760 : 1_048_576
         }
     };
 };
