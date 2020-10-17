@@ -59,7 +59,7 @@ export class PortfolioListCell {
     }
 
     public get value(): number {
-        return parseFloat(this.valueString.replace(/[$%<>]/g, ""));
+        return parseFloat(this.valueString.replace(/[$%<>,]/g, ""));
     }
 
     public get valueString(): string {
