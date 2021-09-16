@@ -5,7 +5,7 @@ import path from "path";
 import WebpackShellPluginNext from "webpack-shell-plugin-next";
 import ZipPlugin from "zip-webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
-import { Configuration, WatchIgnorePlugin } from "webpack";
+import { Configuration, WatchIgnorePlugin, WebpackPluginInstance } from "webpack";
 
 const config = (_env: any, argv: any): Configuration => {
     const devMode = argv.mode === "development";
@@ -90,7 +90,7 @@ const config = (_env: any, argv: any): Configuration => {
                 ]
                 : [
                     new CleanWebpackPlugin(),
-                    ...(devMode ? [] : [new ZipPlugin({ filename: "dist.zip" })])
+                    ...(devMode ? [] : [(new ZipPlugin({ filename: "dist.zip" }) as unknown as WebpackPluginInstance)])
                 ])
         ],
         performance: {
