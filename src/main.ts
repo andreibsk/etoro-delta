@@ -87,6 +87,8 @@ function initializeUiLayout(elem: Element) {
 		console.debug("Footer removed.");
 		accountFooter = null;
 	});
+
+	uiLayout.observe();
 }
 
 async function onCreateSnapshotRequest() {

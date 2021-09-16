@@ -34,24 +34,32 @@ export class UiLayout {
         this.oldVirtualMode = this.virtualMode;
         this.portfolioAdded.attach(_ => this.onPortfolioAdded());
         this.observer = new MutationObserver(m => this.onMutationObserved(m));
-
-        const portfolioElement = element.querySelector(Portfolio.selector);
-        if (portfolioElement)
-            this.portfolio = new Portfolio(portfolioElement);
-
-        const headerElement = element.querySelector(Header.selector);
-        if (headerElement)
-            this.header = new Header(headerElement);
-
-        const footerElement = element.querySelector(EtAccountBalanceFooter.selector);
-        if (footerElement)
-            this.footer = new EtAccountBalanceFooter(footerElement);
-
-        this.observer.observe(this.element, UiLayout.observerOptions);
     }
 
     public get virtualMode(): boolean {
         return this.element.querySelector(".demo-mode") != null;
+    }
+
+    public observe() {
+        const headerElement = this.element.querySelector(Header.selector);
+        if (headerElement) {
+            this.header = new Header(headerElement);
+            this.headerAdded.post(this.header);
+        }
+
+        const footerElement = this.element.querySelector(EtAccountBalanceFooter.selector);
+        if (footerElement) {
+            this.footer = new EtAccountBalanceFooter(footerElement);
+            this.footerAdded.post(this.footer);
+        }
+
+        const portfolioElement = this.element.querySelector(Portfolio.selector);
+        if (portfolioElement) {
+            this.portfolio = new Portfolio(portfolioElement);
+            this.portfolioAdded.post(this.portfolio);
+        }
+
+        this.observer.observe(this.element, UiLayout.observerOptions);
     }
 
     private onMutationObserved(mutations: MutationRecord[]) {
