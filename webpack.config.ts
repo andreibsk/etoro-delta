@@ -71,7 +71,7 @@ const config = (_env: any, argv: any): Configuration => {
             new CopyWebpackPlugin({
                 patterns: [
                     "src/manifest.json",
-                    { from: "src/images/*.png", to: "images/[name].[ext]" }
+                    { from: "src/images/*.png", to: "images/[name][ext]" }
                 ]
             }),
             new MiniCssExtractPlugin(),
