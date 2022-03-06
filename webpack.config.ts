@@ -83,7 +83,7 @@ const config = (_env: any, argv: any): Configuration => {
                 ? [
                     new WebpackShellPluginNext({
                         onBuildEnd: {
-                            scripts: ["npx tsm -e default --watch --ignoreInitial src"],
+                            scripts: ["npx typed-scss-modules --watch --ignoreInitial src"],
                             parallel: true
                         }
                     })
