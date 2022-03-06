@@ -108,7 +108,7 @@ export class FooterUnit {
     }
 
     public get value(): number {
-        return parseFloat(this.valueElement.childNodes[1].nodeValue!.match(/[\d,]+\.\d\d/)![0].replace(",", ""));
+        return parseFloat(this.valueElement.childNodes[1].nodeValue!.match(/-?[\d,]+\.\d\d/)![0].replace(",", ""));
     }
 
     public set compareSnapshot(snapshot: FooterUnitSnapshot | null) {
