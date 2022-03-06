@@ -4,7 +4,7 @@ import { storage, Snapshot } from "./Storage";
 import { Header } from "./header";
 import { EtAccountBalanceFooter } from "./footer";
 import { filter } from "./Utils";
-import { browser, Management } from "webextension-polyfill-ts";
+import browser, { Management } from "webextension-polyfill";
 
 const manifest = browser.runtime.getManifest();
 console.log(manifest.name + " v" + manifest.version + ' loaded.');

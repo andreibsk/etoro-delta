@@ -1,4 +1,4 @@
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 
 const manifest = browser.runtime.getManifest();
 console.info(manifest.name + " v" + manifest.version + " background script started.");

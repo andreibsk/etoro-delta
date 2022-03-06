@@ -1,5 +1,5 @@
 import styles from "../main.scss";
-import { browser } from "webextension-polyfill-ts";
+import browser from "webextension-polyfill";
 import { SnapshotList } from "./SnapshotList";
 import { SnapshotItem } from "./SnapshotItem";
 import { SyncEvent } from "ts-events";
