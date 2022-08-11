@@ -34,7 +34,7 @@
     "zip-webpack-plugin": "^4.0.1"
   },
   "dependencies": {
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "ts-events": "^3.4.1"
   }
 }
