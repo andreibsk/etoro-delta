@@ -16,7 +16,7 @@ export type PortfolioListRowSnapshot = Omit<{
 }, "marketName">;
 
 export class PortfolioListRow {
-    public static readonly elementSelector: string = ".ui-table-row-container";
+    public static readonly elementSelector: string = ".et-table-row";
 
     private readonly element: Element;
     private readonly cells: Readonly<PortfolioListRowCells>;
@@ -26,18 +26,18 @@ export class PortfolioListRow {
             throw new Error("Element doesn't match a PortfolioListRow.");
 
         this.element = element;
-        const marketName = PortfolioListCell.tryConstruct(this.element, "action", "market-name", false);
+        const marketName = PortfolioListCell.tryConstruct(this.element, "market-name", false);
         if (!marketName)
             throw new Error("Element doesn't match a PortfolioListRow (market name not detected).");
 
         this.cells = {
             marketName: marketName,
-            profit: PortfolioListCell.tryConstruct(this.element, "container-profit", "profit"),
+            profit: PortfolioListCell.tryConstruct(this.element, "profit"),
             gain: PortfolioListCell.tryConstruct(this.element, "gain"),
             fees: PortfolioListCell.tryConstruct(this.element, "fees"),
-            invested: PortfolioListCell.tryConstruct(this.element, "invested", "invested-value", "neutral"),
-            netInvested: PortfolioListCell.tryConstruct(this.element, "total-amount", "total-amount", "neutral"),
-            openRate: PortfolioListCell.tryConstruct(this.element, "open-rate", "avg-open-rate", "neutral"),
+            invested: PortfolioListCell.tryConstruct(this.element, "invested-value", "neutral"),
+            netInvested: PortfolioListCell.tryConstruct(this.element, "total-amount", "neutral"),
+            openRate: PortfolioListCell.tryConstruct(this.element, "avg-open-rate", "neutral"),
             lastPrice: PortfolioListCell.tryConstruct(this.element, "last-price")
         };
     }

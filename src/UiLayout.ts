@@ -5,7 +5,7 @@ import { Header } from "./header";
 import { EtAccountBalanceFooter } from "./footer";
 
 export class UiLayout {
-    public static readonly selector: string = "ui-layout";
+    public static readonly selector: string = ".main";
     private static observerOptions: MutationObserverInit = { childList: true, subtree: true };
 
     private readonly element: Element;

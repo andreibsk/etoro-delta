@@ -1,22 +1,22 @@
 import { Delta, Mode } from "../Delta";
 
+const automationAttribute = "automation-id";
 const cellPrefix: string = "portfolio-overview-table-body-cell";
 const cellContainerPrefix: string = "portfolio-overview-table-cell-container-";
-const eIdAttributeName = "data-etoro-automation-id";
 const valueObserveOptions: MutationObserverInit = { characterData: true, subtree: true };
 
 const selector = {
-    portfolioListCellContainer: `[${eIdAttributeName}^='${cellContainerPrefix}']`,
+    portfolioListCellContainer: `[${automationAttribute}^='${cellContainerPrefix}']`,
 
-    cell: (s: string) => `[${eIdAttributeName}='${cellPrefix}-${s}']`,
-    cellContainer: (s: string) => `[${eIdAttributeName}='${cellContainerPrefix}${s}']`
+    cell: (s: string) => `[${automationAttribute}='${cellPrefix}-${s}']`,
+    cellContainer: (s: string) => `[${automationAttribute}='${cellContainerPrefix}${s}']`
 };
 
 export const PortfolioListCellSelector = selector;
 export type PortfolioListCellSnapshot = number;
 
 export class PortfolioListCell {
-    private readonly element: Element;
+    private readonly container: Element | null;
     private readonly valueElement: Element;
 
     private cellDelta: Delta | null;
@@ -24,8 +24,8 @@ export class PortfolioListCell {
     private readonly compare: false | Mode;
     private readonly compareObserver: MutationObserver;
 
-    private constructor(element: Element, valueElement: Element, compare: false | Mode = "positiveNegative") {
-        this.element = element;
+    private constructor(container: Element | null, valueElement: Element, compare: false | Mode = "positiveNegative") {
+        this.container = container;
         this.valueElement = valueElement;
         this.compare = compare;
         this.compareObserver = new MutationObserver((m, o) => this.onDeltaChanged(m, o));
@@ -36,7 +36,7 @@ export class PortfolioListCell {
     }
 
     private set compareValue(value: number | null) {
-        if (!this.compare)
+        if (!this.compare || !this.container)
             return;
 
         this.compareObserver.disconnect();
@@ -46,7 +46,7 @@ export class PortfolioListCell {
             this.compareObserver.observe(this.valueElement, valueObserveOptions);
             if (this.cellDelta == null) {
                 this.cellDelta = new Delta({ mode: this.compare });
-                this.element.appendChild(this.cellDelta.element);
+                this.container.appendChild(this.cellDelta.element);
             }
             this.cellDelta.value = this.value - value;
         }
@@ -66,16 +66,12 @@ export class PortfolioListCell {
         return this.valueElement.textContent!.trim();
     }
 
-    public static elementSelector(name: string): string {
-        return selector.cellContainer(name);
-    }
+    public static tryConstruct(parentElement: Element, name: string, compare?: false | Mode): PortfolioListCell | undefined {
+        const valueElement = parentElement?.querySelector(selector.cell(name));
+        const container = valueElement?.closest(".et-table-info");
 
-    public static tryConstruct(parentElement: Element, name: string, valueName?: string, compare?: false | Mode): PortfolioListCell | undefined {
-        const element = parentElement.querySelector(selector.cellContainer(name));
-        const valueElement = element?.querySelector(selector.cell(valueName ?? name));
-
-        return element && valueElement && valueElement.textContent != null
-            ? new PortfolioListCell(element, valueElement, compare)
+        return (compare == false || container) && valueElement && valueElement.textContent != null
+            ? new PortfolioListCell(container ?? null, valueElement, compare)
             : undefined;
     }
 
