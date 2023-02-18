@@ -1,8 +1,9 @@
-$delta-green: #6bad10;
+$delta-green: #3fb923;
 
 .delta {
     color: #888888;
     font-size: 13px;
+    font-weight: normal;
 
     :global(.current-num-outline) + & {
         padding-right: 5px;
@@ -29,12 +30,12 @@ $delta-green: #6bad10;
 
 .arrow-sign-positive {
     @include arrow-sign;
-    border-bottom: 5px solid #6bad10;
+    border-bottom: 5px solid #3dae23;
 }
 
 .arrow-sign-negative {
     @include arrow-sign;
-    border-top: 5px solid #d0021b;
+    border-top: 5px solid #e8464a;
 }
 
 .footer-unit-value-percent {
@@ -56,7 +57,7 @@ $delta-green: #6bad10;
 
 $control-menu-item-border: .5px solid rgba(151,151,151,.1);
 $control-menu-item-color: #636363;
-$control-menu-item-color-hover: #2b2b2b;
+$control-menu-item-color-hover: #080f13;
 $control-menu-footer-color: #777777;
 
 .control-menu-container {
