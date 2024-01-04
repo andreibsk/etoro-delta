@@ -1,6 +1,6 @@
 {
   "name": "etoro-delta",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "eToro Delta",
   "private": true,
   "scripts": {
